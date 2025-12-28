@@ -1,0 +1,147 @@
+name: Update Repository
+
+on:
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  update-repository:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 允许提交更改
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整历史记录
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+      - name: Create repo directory and sync repositories
+        id: sync
+        run: |
+          # 创建repo目录
+          mkdir -p repo
+          cd repo
+          
+          # 定义要同步的仓库列表
+          declare -A REPOS=(
+            ["luci-app-adguardhome"]="https://github.com/kiddin9/luci-app-adguardhome"
+            ["luci-app-ddns-go"]="https://github.com/smallprogram/luci-app-ddns-go"
+            # 添加更多仓库，格式: ["本地目录"]="仓库URL"
+            # ["another-repo"]="https://github.com/user/another-repo"
+          )
+          
+          UPDATED_REPOS=()
+          
+          for dir in "${!REPOS[@]}"; do
+            repo_url=${REPOS[$dir]}
+            echo "Syncing $dir from $repo_url"
+            
+            # 克隆新仓库到repo目录
+            git clone --depth 1 "$repo_url" "$dir"
+            
+            # 移除克隆产生的.git目录
+            if [ -d "$dir/.git" ]; then
+              rm -rf "$dir/.git"
+              echo "Removed .git from $dir"
+            fi
+            
+            # 记录更新的仓库
+            UPDATED_REPOS+=("$dir")
+          done
+          
+          # 返回工作目录
+          cd ..
+          
+          # 保存更新的仓库列表供后续步骤使用
+          echo "updated_repos=${UPDATED_REPOS[*]}" >> $GITHUB_OUTPUT
+
+      - name: Move ddns-go files to repo directory
+        run: |
+          # 检查repo/luci-app-ddns-go目录是否存在
+          if [ -d "repo/luci-app-ddns-go" ]; then
+            echo "Moving files from repo/luci-app-ddns-go to repo directory"
+            
+            # 安全移动所有内容（处理目录冲突）
+            find "repo/luci-app-ddns-go" -mindepth 1 -maxdepth 1 -exec sh -c '
+              for item do
+                target="repo/$(basename "$item")"
+                mv "$item" "repo/"
+              done
+            ' sh {} +
+            
+            # 删除空目录
+            rmdir "repo/luci-app-ddns-go"
+            echo "Files moved successfully to repo directory"
+          else
+            echo "repo/luci-app-ddns-go directory not found, skipping move"
+          fi
+
+      - name: Move all content to root and clean up
+        run: |
+          # 检查repo目录是否存在
+          if [ -d "repo" ]; then
+            echo "Moving all content from repo to root directory"
+            
+            # 安全移动所有内容（处理目录冲突）
+            find "repo" -mindepth 1 -maxdepth 1 -exec sh -c '
+              for item do
+                target="./$(basename "$item")"
+                if [ -e "$target" ]; then
+                  echo "Replacing existing $target"
+                  rm -rf "$target"
+                fi
+                mv "$item" ./
+              done
+            ' sh {} +
+            
+            # 删除空目录
+            rmdir "repo"
+            echo "All content moved to root directory"
+          else
+            echo "repo directory not found"
+          fi
+
+      - name: Commit and push changes
+        run: |
+          # 添加所有更改
+          git add .
+          
+          # 检查是否有实际更改
+          if git diff-index --quiet HEAD --; then
+            echo "No changes detected"
+          else
+            # 生成详细的提交信息
+            TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+            COMMIT_MSG="Repository updates ($TIMESTAMP)"
+            
+            # 添加更新的仓库详情
+            IFS=' ' read -ra REPO_LIST <<< "${{ steps.sync.outputs.updated_repos }}"
+            for repo in "${REPO_LIST[@]}"; do
+              COMMIT_MSG+="
+- Updated $repo"
+              
+              # 添加特殊标记移动操作
+              if [ "$repo" == "luci-app-ddns-go" ]; then
+                COMMIT_MSG+ " (files moved to root via repo directory)"
+              fi
+            done
+            
+            # 添加变更统计
+            STATS=$(git diff --stat HEAD)
+            COMMIT_MSG+="
+
+Changes summary:
+$STATS"
+            
+            # 提交更改
+            git commit -m "$COMMIT_MSG"
+            git push origin HEAD:${GITHUB_REF#refs/heads/}
+            
+            echo "Committed changes with message:"
+            echo "$COMMIT_MSG"
+          fi
