@@ -24,13 +24,18 @@ jobs:
 
       - name: Create repo directory and sync repositories
         id: sync
-        run: |        
+        run: |
+          mkdir repos
+          cd repos
+          
           # 定义要同步的仓库列表
           declare -A REPOS=(
             ["luci-app-adguardhome"]="https://github.com/kiddin9/luci-app-adguardhome"
             ["luci-app-tcpdump"]="https://github.com/KFERMercer/luci-app-tcpdump"
             ["luci-app-smbuser"]="https://github.com/sbwml/luci-app-smbuser"
             ["luci-app-ddns-go"]="https://github.com/sirpdboy/luci-app-ddns-go"
+            ["luci-theme-argon"]="https://github.com/OneNAS-space/luci-theme-argon"
+            ["luci-theme-argon"]="https://github.com/zfdx123/msd_lite"
             # 添加更多仓库，格式: ["本地目录"]="仓库URL"
             # ["another-repo"]="https://github.com/user/another-repo"
           )
@@ -56,6 +61,31 @@ jobs:
           
           # 保存更新的仓库列表供后续步骤使用
           echo "updated_repos=${UPDATED_REPOS[*]}" >> $GITHUB_OUTPUT
+
+      - name: Move all content to root and clean up
+        run: |
+          # 检查repo目录是否存在
+          if [ -d "repos" ]; then
+            echo "Moving all content from repos to root directory"
+            
+            # 安全移动所有内容（处理目录冲突）
+            find "repos" -mindepth 1 -maxdepth 1 -exec sh -c '
+              for item do
+                target="./$(basename "$item")"
+                if [ -e "$target" ]; then
+                  echo "Replacing existing $target"
+                  rm -rf "$target"
+                fi
+                mv "$item" ./
+              done
+            ' sh {} +
+            
+            # 删除空目录
+            rmdir "repo"
+            echo "All content moved to root directory"
+          else
+            echo "repo directory not found"
+          fi
 
       - name: Commit and push changes
         run: |
