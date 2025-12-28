@@ -123,7 +123,7 @@ jobs:
             IFS=' ' read -ra REPO_LIST <<< "${{ steps.sync.outputs.updated_repos }}"
             for repo in "${REPO_LIST[@]}"; do
               COMMIT_MSG+="
-- Updated $repo"
+              - Updated $repo"
               
               # 添加特殊标记移动操作
               if [ "$repo" == "luci-app-ddns-go" ]; then
@@ -134,9 +134,8 @@ jobs:
             # 添加变更统计
             STATS=$(git diff --stat HEAD)
             COMMIT_MSG+="
-
-Changes summary:
-$STATS"
+            Changes summary:
+            $STATS"
             
             # 提交更改
             git commit -m "$COMMIT_MSG"
