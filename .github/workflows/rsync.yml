@@ -81,7 +81,7 @@ jobs:
             ' sh {} +
             
             # 删除空目录
-            rmdir "repo"
+            rmdir "repos"
             echo "All content moved to root directory"
           else
             echo "repo directory not found"
