@@ -97,7 +97,7 @@ jobs:
             echo "No changes detected"
           else
             # 生成详细的提交信息
-            TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+            TIMESTAMP=$(TZ='Asia/Shanghai' date +"%Y-%m-%d %H:%M:%S")
             COMMIT_MSG="Repository updates ($TIMESTAMP)"
             
             # 添加更新的仓库详情
