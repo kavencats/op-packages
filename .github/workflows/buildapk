@@ -1,0 +1,68 @@
+name: Build apk Packages 
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Package version (e.g. v1.0.0)'
+        required: false
+        default: 'manual-build'
+
+jobs:
+  build:
+    name: Build ${{ matrix.arch }}-${{ matrix.pakgs }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - mipsel_24kc
+          - aarch64_cortex-a53
+        SDK:
+          - openwrt-25.12
+        pakgs:
+          - luci-app-msd_lite
+          - luci-app-ddns-go
+          - luci-theme-argon
+          - luci-app-tcpdump
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 生成时间戳
+      - name: Generate timestamp
+        id: timestamp
+        run: echo "time=$(TZ='Asia/Shanghai' date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Building packages for ${{ matrix.pakgs }}
+        uses: sbwml/openwrt-gh-action-sdk@main
+        env:
+          ARCH: ${{ matrix.arch }}-${{ matrix.SDK }}
+          FEEDNAME: packages_ci
+          PACKAGES: ${{ matrix.pakgs }}
+          NO_REFRESH_CHECK: true
+          V: s
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arch }}-${{ matrix.SDK }}-${{ matrix.pakgs }}-${{ steps.timestamp.outputs.time }}
+          path: bin/packages/${{ matrix.arch }}/packages_ci/*.apk
+
+      - name: Upload packages for ${{ matrix.pakgs }}
+        uses: ncipollo/release-action@v1
+        with:
+          # 标签包含架构
+          tag: ${{ github.event.inputs.version || 'manual-build' }}-${{ matrix.arch }}
+          name: "${{ github.event.inputs.version || 'Manual Build' }} (${{ matrix.arch }})"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
+          replacesArtifacts: true
+          artifacts: "bin/packages/${{ matrix.arch }}/packages_ci/*.apk"
+          body: |
+            ## Package Information
+            - Architecture: ${{ matrix.arch }}
+            - SDK: ${{ matrix.SDK }}
+            - Build Time: ${{ steps.timestamp.outputs.time }}
