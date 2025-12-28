@@ -68,13 +68,18 @@ jobs:
         run: |
           # 检查repo/luci-app-ddns-go目录是否存在
           if [ -d "repo/luci-app-ddns-go" ]; then
+            mv repo/luci-app-ddns-go repo/1
             echo "Moving files from repo/luci-app-ddns-go to repo directory"
             
             # 安全移动所有内容（处理目录冲突）
-            find "repo/luci-app-ddns-go" -mindepth 1 -maxdepth 1 -exec sh -c '
+            find "repo/1" -mindepth 1 -maxdepth 1 -exec sh -c '
               for item do
                 target="repo/$(basename "$item")"
-                mv "$item" "repo/"
+                if [ -e "$target" ]; then
+                  echo "Replacing existing $target"
+                  rm -rf "$target"
+                fi
+                mv "$item" "repo/luci-app-ddns-go"
               done
             ' sh {} +
             
