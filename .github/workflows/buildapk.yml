@@ -1,4 +1,4 @@
-name: Build apk Packages 
+name: Build apk Packages
 
 on:
   workflow_dispatch:
@@ -14,17 +14,33 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 1  # 确保顺序执行
       matrix:
-        arch:
-          - mipsel_24kc
-          - aarch64_cortex-a53
-        SDK:
-          - openwrt-25.12
-        pakgs:
-          - luci-app-msd_lite
-          - luci-app-ddns-go
-          - luci-theme-argon
-          - luci-app-tcpdump
+        include:
+          - arch: mipsel_24kc
+            SDK: openwrt-25.12
+            pakgs: luci-app-msd_lite
+          - arch: mipsel_24kc
+            SDK: openwrt-25.12
+            pakgs: luci-app-ddns-go
+          - arch: mipsel_24kc
+            SDK: openwrt-25.12
+            pakgs: luci-theme-argon
+          - arch: mipsel_24kc
+            SDK: openwrt-25.12
+            pakgs: luci-app-tcpdump
+          - arch: aarch64_cortex-a53
+            SDK: openwrt-25.12
+            pakgs: luci-app-msd_lite
+          - arch: aarch64_cortex-a53
+            SDK: openwrt-25.12
+            pakgs: luci-app-ddns-go
+          - arch: aarch64_cortex-a53
+            SDK: openwrt-25.12
+            pakgs: luci-theme-argon
+          - arch: aarch64_cortex-a53
+            SDK: openwrt-25.12
+            pakgs: luci-app-tcpdump
 
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +70,6 @@ jobs:
       - name: Upload packages for ${{ matrix.pakgs }}
         uses: ncipollo/release-action@v1
         with:
-          # 标签包含架构
           tag: ${{ github.event.inputs.version || 'manual-build' }}-${{ matrix.arch }}
           name: "${{ github.event.inputs.version || 'Manual Build' }} (${{ matrix.arch }})"
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -64,5 +79,6 @@ jobs:
           body: |
             ## Package Information
             - Architecture: ${{ matrix.arch }}
+            - Package: ${{ matrix.pakgs }}
             - SDK: ${{ matrix.SDK }}
             - Build Time: ${{ steps.timestamp.outputs.time }}
