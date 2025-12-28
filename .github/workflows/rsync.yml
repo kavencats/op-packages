@@ -75,11 +75,6 @@ jobs:
             for repo in "${REPO_LIST[@]}"; do
               COMMIT_MSG+="
               - Updated $repo"
-              
-              # 添加特殊标记移动操作
-              if [ "$repo" == "luci-app-ddns-go" ]; then
-                COMMIT_MSG+ " (files moved to root via repo directory)"
-              fi
             done
             
             # 添加变更统计
