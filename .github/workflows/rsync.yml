@@ -24,11 +24,7 @@ jobs:
 
       - name: Create repo directory and sync repositories
         id: sync
-        run: |
-          # 创建repo目录
-          mkdir -p repo
-          cd repo
-          
+        run: |        
           # 定义要同步的仓库列表
           declare -A REPOS=(
             ["luci-app-adguardhome"]="https://github.com/kiddin9/luci-app-adguardhome"
@@ -58,62 +54,8 @@ jobs:
             UPDATED_REPOS+=("$dir")
           done
           
-          # 返回工作目录
-          cd ..
-          
           # 保存更新的仓库列表供后续步骤使用
           echo "updated_repos=${UPDATED_REPOS[*]}" >> $GITHUB_OUTPUT
-
-      - name: Move ddns-go files to repo directory
-        run: |
-          # 检查repo/luci-app-ddns-go目录是否存在
-          if [ -d "repo/luci-app-ddns-go" ]; then
-            mv repo/luci-app-ddns-go repo/1
-            echo "Moving files from repo/luci-app-ddns-go to repo directory"
-            
-            # 安全移动所有内容（处理目录冲突）
-            find "repo/1" -mindepth 1 -maxdepth 1 -exec sh -c '
-              for item do
-                target="repo/$(basename "$item")"
-                if [ -e "$target" ]; then
-                  echo "Replacing existing $target"
-                  rm -rf "$target"
-                fi
-                mv "$item" "repo/luci-app-ddns-go"
-              done
-            ' sh {} +
-            
-            # 删除空目录
-            rmdir "repo/luci-app-ddns-go"
-            echo "Files moved successfully to repo directory"
-          else
-            echo "repo/luci-app-ddns-go directory not found, skipping move"
-          fi
-
-      - name: Move all content to root and clean up
-        run: |
-          # 检查repo目录是否存在
-          if [ -d "repo" ]; then
-            echo "Moving all content from repo to root directory"
-            
-            # 安全移动所有内容（处理目录冲突）
-            find "repo" -mindepth 1 -maxdepth 1 -exec sh -c '
-              for item do
-                target="./$(basename "$item")"
-                if [ -e "$target" ]; then
-                  echo "Replacing existing $target"
-                  rm -rf "$target"
-                fi
-                mv "$item" ./
-              done
-            ' sh {} +
-            
-            # 删除空目录
-            rmdir "repo"
-            echo "All content moved to root directory"
-          else
-            echo "repo directory not found"
-          fi
 
       - name: Commit and push changes
         run: |
