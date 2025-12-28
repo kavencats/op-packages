@@ -32,7 +32,9 @@ jobs:
           # 定义要同步的仓库列表
           declare -A REPOS=(
             ["luci-app-adguardhome"]="https://github.com/kiddin9/luci-app-adguardhome"
-            ["luci-app-ddns-go"]="https://github.com/smallprogram/luci-app-ddns-go"
+            ["luci-app-tcpdump"]="https://github.com/KFERMercer/luci-app-tcpdump"
+            ["luci-app-smbuser"]="https://github.com/sbwml/luci-app-smbuser"
+            ["luci-app-ddns-go"]="https://github.com/sirpdboy/luci-app-ddns-go"
             # 添加更多仓库，格式: ["本地目录"]="仓库URL"
             # ["another-repo"]="https://github.com/user/another-repo"
           )
