@@ -17,6 +17,9 @@ jobs:
       max-parallel: 1  # 确保顺序执行
       matrix:
         include:
+          - arch: aarch64_cortex-a53
+            SDK: openwrt-25.12
+            pakgs: luci-app-adguardhome
           - arch: mipsel_24kc
             SDK: openwrt-25.12
             pakgs: luci-app-msd_lite
