@@ -1,0 +1,210 @@
+name: build-release (OpenWrt 24.10.5 x86_64)
+
+on:
+  push:
+    branches: 
+      - master
+    tags: ['*']
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Manually specify PKG_RELEASE version (optional)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+env:
+  RELEASE: 24.10.5
+  TARGET: x86
+  SUBTARGET: 64
+  PKG_DIR_NAME: luci-app-adguardhome
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && -n "${{ github.event.inputs.release_version }}" ]]; then
+            REL="${{ github.event.inputs.release_version }}"
+            echo "Using manually specified version: ${REL}"
+
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            REL="${GITHUB_REF_NAME}"
+            echo "Using tag as version: ${REL}"
+            sed -i "s/^PKG_RELEASE:=.*/PKG_RELEASE:=${REL}/" Makefile
+
+          elif [[ "${GITHUB_REF}" == refs/heads/master ]]; then
+            CHANGED=$(git diff --name-only HEAD~1)
+
+            if echo "$CHANGED" | grep -Eq '^(Makefile|luasrc/|root/)'; then
+              if echo "$CHANGED" | grep -Eq '^(luasrc/|root/)'; then
+                CUR_VER=$(grep -E '^PKG_VERSION:=' Makefile | sed 's/^PKG_VERSION:=//')
+                IFS='.' read -r major minor patch <<< "$CUR_VER"
+                patch=$((patch + 1))
+                NEW_VER="${major}.${minor}.${patch}"
+                sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=${NEW_VER}/" Makefile
+                echo "Source code changed, PKG_VERSION incremented: ${CUR_VER} → ${NEW_VER}"
+
+                git config user.name "github-actions[bot]"
+                git config user.email "github-actions[bot]@users.noreply.github.com"
+                git add Makefile
+                git commit -m "ci: bump PKG_VERSION to ${NEW_VER} [skip ci]" || true
+                git push origin HEAD:master || true
+              fi
+
+              REL=$(grep -E '^PKG_RELEASE:=' Makefile | sed 's/^PKG_RELEASE:=//')
+              echo "Using PKG_RELEASE from Makefile as version: ${REL}"
+            else
+              echo "No relevant changes detected, skipping release"
+              REL=""
+            fi
+          fi
+
+          echo "RESOLVED_TAG=${REL}" >> "$GITHUB_ENV"
+
+      - name: Install build dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential clang flex bison g++ gawk \
+            gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev \
+            python3-setuptools rsync swig unzip zlib1g-dev file wget zstd gh
+
+      - name: Cache SDK tarball
+        uses: actions/cache@v5
+        with:
+          path: _sdk/sdk.tar.zst
+          key: sdk-${{ env.RELEASE }}-${{ env.TARGET }}-${{ env.SUBTARGET }}
+
+      - name: Download and extract SDK
+        run: |
+          set -eux
+          BASE="https://downloads.openwrt.org/releases/${RELEASE}/targets/${TARGET}/${SUBTARGET}/"
+          if [ ! -f _sdk/sdk.tar.zst ]; then
+            SDK_TARBALL=$(curl -fsSL "$BASE" | grep -o 'openwrt-sdk-[^"]*\.tar\.zst' | head -n1)
+            mkdir -p _sdk
+            wget -q "${BASE}${SDK_TARBALL}" -O _sdk/sdk.tar.zst
+          fi
+          tar --zstd -xf _sdk/sdk.tar.zst -C _sdk
+          SDK_DIR="$(find "$PWD/_sdk" -maxdepth 1 -type d -name 'openwrt-sdk-*' -print -quit)"
+          echo "SDK_DIR=${SDK_DIR}" >> "$GITHUB_ENV"
+
+      - name: Copy package into SDK
+        run: |
+          cd "$SDK_DIR"
+          mkdir -p package/${PKG_DIR_NAME}
+          rsync -a --delete "$GITHUB_WORKSPACE/" "package/${PKG_DIR_NAME}/" \
+            --exclude '.git' --exclude '.github' --exclude '_sdk' --exclude 'out'
+
+      - name: Update luci feed and install luci-base
+        run: |
+          cd "$SDK_DIR"
+          ./scripts/feeds update luci
+          ./scripts/feeds install luci-base
+
+      - name: Generate default config
+        run: |
+          cd "$SDK_DIR"
+          make defconfig
+
+      - name: Build package
+        run: |
+          cd "$SDK_DIR"
+          make package/${PKG_DIR_NAME}/clean V=s || true
+          make package/${PKG_DIR_NAME}/compile -j"$(nproc)" V=sc
+
+      - name: Collect build artifacts
+        run: |
+          cd "$SDK_DIR"
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          find bin/packages -type f -name "*${PKG_DIR_NAME}*ipk" -print -exec cp -f {} "$GITHUB_WORKSPACE/out/" \;
+          cd "$GITHUB_WORKSPACE/out" && sha256sum *.ipk > SHA256SUMS.txt || true && ls -l
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: ipks-${{ env.RESOLVED_TAG != '' && env.RESOLVED_TAG || github.ref_name }}-x86_64
+          path: out/
+          if-no-files-found: error
+
+      - name: Ensure tag exists (only master/workflow_dispatch)
+        if: env.RESOLVED_TAG != '' && github.ref_type != 'tag'
+        run: |
+          TAG="${RESOLVED_TAG}"
+          if git ls-remote --tags origin | grep -q "refs/tags/${TAG}$"; then
+            echo "Tag ${TAG} already exists, skipping creation"
+          else
+            echo "Creating and pushing tag: ${TAG}"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG" -m "Release $TAG"
+            git push origin "$TAG"
+          fi
+
+      - name: Publish to Releases (replace old assets if exist)
+        if: env.RESOLVED_TAG != ''
+        run: |
+          TAG="${RESOLVED_TAG}"
+          echo "Preparing release: $TAG"
+
+          EXISTING=$(gh release view "$TAG" --json tagName -q .tagName || true)
+
+          if [ -n "$EXISTING" ]; then
+            echo "Release $TAG already exists, deleting old assets"
+            for asset in $(gh release view "$TAG" --json assets -q '.assets[].name'); do
+              gh release delete-asset "$TAG" "$asset" -y
+            done
+          else
+            echo "Release $TAG does not exist, creating new one"
+            gh release create "$TAG" -t "$TAG" -n "Release $TAG"
+          fi
+
+          gh release upload "$TAG" out/*.ipk --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: 🔍 Extract version and release from Makefile
+        id: version
+        run: |
+          PKG_VERSION=$(grep -E '^PKG_VERSION *:?=' Makefile | head -n1 | cut -d= -f2 | tr -d '[:space:]')
+          PKG_RELEASE=$(grep -E '^PKG_RELEASE *:?=' Makefile | head -n1 | cut -d= -f2 | tr -d '[:space:]')
+          COMBINED_VERSION="${PKG_VERSION}-${PKG_RELEASE}"
+          echo "📦 Version: $COMBINED_VERSION"
+          echo "version=$COMBINED_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout custom-packages repo
+        uses: actions/checkout@v6
+        with:
+          repository: OneNAS-space/custom-packages
+          token: ${{ secrets.CUSTOM_PACKAGES_TOKEN }}
+          path: custom-packages
+
+      - name: Update luci artifacts
+        run: |
+          mkdir -p custom-packages/luci
+          
+          find ./out -type f -name "*.ipk" | while read -r f; do
+            base=$(basename "$f")
+            pkgname=$(echo "$base" | sed -E 's/^([^_]+)_.*$/\1/')
+            echo "Cleaning old versions of $pkgname"
+            rm -f custom-packages/luci/${pkgname}_*.ipk
+            cp "$f" custom-packages/luci/
+          done
+          ls -la custom-packages/luci/
+          echo "PKG_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
+          cd custom-packages
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add luci/
+          git commit -m "Update to - v${{ steps.version.outputs.version }}" || echo "No changes"
+          git push
