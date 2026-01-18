@@ -14,36 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 1  # 确保顺序执行
       matrix:
-        include:
-          - arch: aarch64_cortex-a53
-            SDK: openwrt-25.12
-            pakgs: luci-app-lucky
-          - arch: mipsel_24kc
-            SDK: openwrt-25.12
-            pakgs: luci-app-msd_lite
-          - arch: mipsel_24kc
-            SDK: openwrt-25.12
-            pakgs: luci-app-ddns-go
-          - arch: mipsel_24kc
-            SDK: openwrt-25.12
-            pakgs: luci-theme-argon
-          - arch: mipsel_24kc
-            SDK: openwrt-25.12
-            pakgs: luci-app-tcpdump
-          - arch: aarch64_cortex-a53
-            SDK: openwrt-25.12
-            pakgs: luci-app-msd_lite
-          - arch: aarch64_cortex-a53
-            SDK: openwrt-25.12
-            pakgs: luci-app-ddns-go
-          - arch: aarch64_cortex-a53
-            SDK: openwrt-25.12
-            pakgs: luci-theme-argon
-          - arch: aarch64_cortex-a53
-            SDK: openwrt-25.12
-            pakgs: luci-app-tcpdump
+        arch:
+          - mipsel_24kc
+          - aarch64_cortex-a53
+        SDK:
+          - openwrt-25.12
+        pakgs:
+          - luci-app-msd_lite
+          - luci-app-ddns-go
+          - luci-theme-argon
+          - luci-app-lucky
 
     steps:
       - uses: actions/checkout@v4
