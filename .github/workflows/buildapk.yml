@@ -19,7 +19,7 @@ jobs:
         include:
           - arch: aarch64_cortex-a53
             SDK: openwrt-25.12
-            pakgs: luci-app-adguardhome
+            pakgs: luci-app-lucky
           - arch: mipsel_24kc
             SDK: openwrt-25.12
             pakgs: luci-app-msd_lite
