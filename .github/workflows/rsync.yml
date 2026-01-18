@@ -36,6 +36,7 @@ jobs:
             ["luci-app-ddns-go"]="https://github.com/sirpdboy/luci-app-ddns-go"
             ["luci-theme-argon"]="https://github.com/OneNAS-space/luci-theme-argon"
             ["luci-app-msd_lite"]="https://github.com/zfdx123/msd_lite"
+            ["luci-app-lucky"]="https://github.com/sirpdboy/luci-app-lucky"
             # 添加更多仓库，格式: ["本地目录"]="仓库URL"
             # ["another-repo"]="https://github.com/user/another-repo"
           )
