@@ -1,4 +1,4 @@
-name: Build OpenAppFilter for MediaTek Filogic
+name: Build OpenAppFilter for OpenWrt
 
 on:
   workflow_dispatch:
@@ -7,59 +7,40 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout OAF Source
-      uses: actions/checkout@v6.0.2
-      with:
-        repository: destan19/OpenAppFilter
-        path: luci-app-oaf
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          repository: destan19/OpenAppFilter
+          ref: main
 
-    - name: Setup OpenWRT SDK
-      run: |
-        wget https://downloads.openwrt.org/releases/25.12.0-rc2/targets/mediatek/filogic/openwrt-sdk-25.12.0-rc2-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
-        tar -xf openwrt-sdk-25.12.0-rc2-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
-        mv openwrt-sdk-25.12.0-rc2-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64 openwrt-sdk
+      - name: Setup OpenWrt SDK
+        uses: actions/setup-openwrt-sdk@v1
+        with:
+          sdk-version: '25.12-rc2'
+          target: 'aarch64_cortex-a53'
+          arch: 'aarch64'
+          toolchain: 'gcc-13.2.1'
 
-    - name: Install Dependencies
-      run: |
-        sudo apt-get install -y build-essential libnl-3-dev libnl-genl-3-dev flex bison
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libncurses5-dev zlib1g-dev gawk flex quilt git-lfs
 
-    - name: Configure Build
-      run: |
-        cd openwrt-sdk
-        # 添加 OAF 源码到 SDK
-        mkdir -p package/luci-app-oaf
-        mkdir -p package/kernel/oaf
-        cp -r ../luci-app-oaf/* package/luci-app-oaf/
-        cp -r package/luci-app-oaf/oaf/* package/kernel/oaf/
-        ls -l package/kernel/
-        
-        # 更新 feeds 并安装依赖
-        ./scripts/feeds update -a
-        ./scripts/feeds install -a
+      - name: Configure Build
+        run: |
+          make defconfig
+          echo "CONFIG_PACKAGE_luci-app-oaf=y" >> .config
+          echo "CONFIG_PACKAGE_kmod-oaf=y" >> .config
 
-        # 生成编译配置
-        echo "CONFIG_PACKAGE_kmod-oaf=y" >> .config
-        echo "CONFIG_PACKAGE_luci-app-oaf=y" >> .config
-        echo "CONFIG_PACKAGE_open-app-filter=y" >> .config
+      - name: Compile Plugins
+        run: |
+          make package/luci-app-oaf/compile V=s
+          make package/kmod-oaf/compile V=s
 
-    - name: Compile Packages
-      run: |
-        cd openwrt-sdk
-        # 编译内核模块
-        make package/kmod-oaf/compile V=s
-        # 编译服务端
-        make package/open-app-filter/compile V=s
-        # 编译 Luci 界面
-        make package/luci-app-oaf/compile V=s
-
-    - name: Collect Artifacts
-      run: |
-        mkdir -p openwrt-sdk/output
-        find bin/packages -name "*.apk" -exec cp {} openwrt-sdk/output \;
-        find bin/targets -name "*.apk" -exec cp {} openwrt-sdk/output \;
-
-    - name: Upload Packages
-      uses: actions/upload-artifact@v6.0.0
-      with:
-        name: oaf-packages
-        path: openwrt-sdk/output/*.apk
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: openappfilter-apks
+          path: |
+            bin/packages/aarch64_cortex-a53/base/luci-app-oaf_*.apk
+            bin/packages/aarch64_cortex-a53/kernel/kmod-oaf_*.apk
