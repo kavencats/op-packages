@@ -26,10 +26,11 @@ jobs:
     - name: Configure Build
       run: |
         ls -l
+        ls luci-app-oaf -l
         cd openwrt-sdk
         # 添加 OAF 源码到 SDK
         mkdir -p package/luci-app-oaf
-        cp -r ./luci-app-oaf/* package/luci-app-oaf/
+        cp -r ../luci-app-oaf/* package/luci-app-oaf/
         
         # 更新 feeds 并安装依赖
         ./scripts/feeds update -a
