@@ -56,7 +56,7 @@ jobs:
         find bin/targets -name "*.apk" -exec cp {} openwrt-sdk/output \;
 
     - name: Upload Packages
-      uses: actions/upload-artifact@V6.0.0
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: oaf-packages
         path: openwrt-sdk/output/*.apk
