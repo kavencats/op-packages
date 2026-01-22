@@ -25,8 +25,8 @@ jobs:
           #- luci-app-ddns-go
           #- luci-theme-argon
           #- luci-app-lucky
-          #- luci-app-oaf
-          - oaf
+          - luci-app-oaf
+          - kmod-oaf
 
     steps:
       - uses: actions/checkout@v4
