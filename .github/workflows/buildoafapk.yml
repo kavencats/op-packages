@@ -32,7 +32,8 @@ jobs:
         mkdir -p package/luci-app-oaf
         mkdir -p package/kmod-oaf
         cp -r ../luci-app-oaf/* package/luci-app-oaf/
-        cp package/luci-app-oaf/oaf package/kmof-oaf
+        cp package/luci-app-oaf/oaf/* package/kmof-oaf/
+        ls -l package/luci-app-oaf/
         
         # 更新 feeds 并安装依赖
         ./scripts/feeds update -a
