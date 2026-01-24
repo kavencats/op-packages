@@ -27,7 +27,7 @@ jobs:
           #- luci-app-lucky
           #- luci-app-oaf
           #- luci-app-adguardhome
-          - luci-app-network_audit
+          - luci-app-netaudit
 
     steps:
       - uses: actions/checkout@v4
