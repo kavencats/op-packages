@@ -1,0 +1,242 @@
+msgid "Network Audit"
+msgstr "网络审计"
+
+msgid "Network traffic monitoring and auditing tool"
+msgstr "网络流量监控和审计工具"
+
+msgid "Overview"
+msgstr "概览"
+
+msgid "Traffic Monitoring"
+msgstr "流量监控"
+
+msgid "Domain Filtering"
+msgstr "域名过滤"
+
+msgid "Settings"
+msgstr "设置"
+
+msgid "Service Status"
+msgstr "服务状态"
+
+msgid "Service Control"
+msgstr "服务控制"
+
+msgid "Restart Service"
+msgstr "重启服务"
+
+msgid "Real-time Statistics"
+msgstr "实时统计"
+
+msgid "Total Traffic"
+msgstr "总流量"
+
+msgid "Active Connections"
+msgstr "活动连接"
+
+msgid "Recent Logs"
+msgstr "最近日志"
+
+msgid "No logs available"
+msgstr "无可用日志"
+
+msgid "Configure network traffic monitoring settings"
+msgstr "配置网络流量监控设置"
+
+msgid "Monitoring Settings"
+msgstr "监控设置"
+
+msgid "Enable Monitoring"
+msgstr "启用监控"
+
+msgid "Enable network traffic monitoring"
+msgstr "启用网络流量监控"
+
+msgid "Update Interval (seconds)"
+msgstr "更新间隔（秒）"
+
+msgid "Log Level"
+msgstr "日志级别"
+
+msgid "Disabled"
+msgstr "禁用"
+
+msgid "Minimal"
+msgstr "最小"
+
+msgid "Normal"
+msgstr "正常"
+
+msgid "Verbose"
+msgstr "详细"
+
+msgid "Monitor Protocols"
+msgstr "监控协议"
+
+msgid "Log New Connections"
+msgstr "记录新连接"
+
+msgid "Log all new network connections"
+msgstr "记录所有新网络连接"
+
+msgid "Max Connections Log"
+msgstr "最大连接记录"
+
+msgid "Maximum connections to log (0 for unlimited)"
+msgstr "最大记录连接数（0表示无限制）"
+
+msgid "Traffic Thresholds"
+msgstr "流量阈值"
+
+msgid "Interface"
+msgstr "接口"
+
+msgid "Threshold Type"
+msgstr "阈值类型"
+
+msgid "Bandwidth"
+msgstr "带宽"
+
+msgid "Connections"
+msgstr "连接数"
+
+msgid "Threshold Value"
+msgstr "阈值"
+
+msgid "Action"
+msgstr "操作"
+
+msgid "Log Only"
+msgstr "仅记录"
+
+msgid "Send Alert"
+msgstr "发送警报"
+
+msgid "Limit Bandwidth"
+msgstr "限制带宽"
+
+msgid "Configure domain and URL filtering rules"
+msgstr "配置域名和URL过滤规则"
+
+msgid "Filtering Settings"
+msgstr "过滤设置"
+
+msgid "Enable Filtering"
+msgstr "启用过滤"
+
+msgid "Enable domain and URL filtering"
+msgstr "启用域名和URL过滤"
+
+msgid "Filtering Mode"
+msgstr "过滤模式"
+
+msgid "Blacklist (block listed)"
+msgstr "黑名单（阻止列出）"
+
+msgid "Whitelist (allow only listed)"
+msgstr "白名单（仅允许列出）"
+
+msgid "Domain Rules"
+msgstr "域名规则"
+
+msgid "Domain"
+msgstr "域名"
+
+msgid "Description"
+msgstr "描述"
+
+msgid "Block"
+msgstr "阻止"
+
+msgid "Redirect"
+msgstr "重定向"
+
+msgid "Redirect URL"
+msgstr "重定向URL"
+
+msgid "Category Filtering"
+msgstr "分类过滤"
+
+msgid "Category"
+msgstr "分类"
+
+msgid "Social Media"
+msgstr "社交媒体"
+
+msgid "Gaming"
+msgstr "游戏"
+
+msgid "Shopping"
+msgstr "购物"
+
+msgid "Video Streaming"
+msgstr "视频流"
+
+msgid "P2P File Sharing"
+msgstr "P2P文件共享"
+
+msgid "Adult Content"
+msgstr "成人内容"
+
+msgid "Limit Access"
+msgstr "限制访问"
+
+msgid "Schedule Block"
+msgstr "计划阻止"
+
+msgid "Schedule"
+msgstr "时间表"
+
+msgid "Configure general plugin settings"
+msgstr "配置插件常规设置"
+
+msgid "General Settings"
+msgstr "常规设置"
+
+msgid "Data Retention (days)"
+msgstr "数据保留（天）"
+
+msgid "Max Log Size (MB)"
+msgstr "最大日志大小（MB）"
+
+msgid "Auto Update Rules"
+msgstr "自动更新规则"
+
+msgid "Automatically update filtering rules"
+msgstr "自动更新过滤规则"
+
+msgid "Update Schedule"
+msgstr "更新计划"
+
+msgid "Notifications"
+msgstr "通知"
+
+msgid "Enable Email Notifications"
+msgstr "启用邮件通知"
+
+msgid "Email Address"
+msgstr "邮箱地址"
+
+msgid "Enable Webhook"
+msgstr "启用Webhook"
+
+msgid "Webhook URL"
+msgstr "Webhook URL"
+
+msgid "Advanced Settings"
+msgstr "高级设置"
+
+msgid "Debug Mode"
+msgstr "调试模式"
+
+msgid "System Logs"
+msgstr "系统日志"
+
+msgid "Clear All Logs"
+msgstr "清除所有日志"
+
+msgid "Configuration"
+msgstr "配置"
+
+msgid "Backup Configuration"
+msgstr "备份配置"
