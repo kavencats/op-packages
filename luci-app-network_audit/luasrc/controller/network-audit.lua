@@ -115,16 +115,34 @@ function action_get_logs()
     
     if fs.access(log_file, "r") then
         logs = fs.readfile(log_file) or ""
+        -- Limit to last 1000 lines
+        local lines = {}
+        for line in logs:gmatch("[^\r\n]+") do
+            table.insert(lines, line)
+        end
+        if #lines > 1000 then
+            logs = table.concat(lines, "\n", #lines - 999)
+        end
+    else
+        logs = translate("No log file found. Service may not be running.")
     end
     
-    luci.http.prepare_content("text/plain")
+    luci.http.prepare_content("text/plain; charset=utf-8")
     luci.http.write(logs)
 end
 
 function action_clear_logs()
     local sys = require "luci.sys"
-    sys.call("echo '' > /var/log/network-audit.log 2>/dev/null")
-    luci.http.prepare_content("application/json")
-    luci.http.write_json({success = true})
-
+    local fs = require "nixio.fs"
+    local log_file = "/var/log/network-audit.log"
+    
+    if fs.access(log_file, "w") then
+        fs.writefile(log_file, "")
+        luci.http.prepare_content("application/json")
+        luci.http.write_json({success = true, message = translate("Logs cleared successfully")})
+    else
+        luci.http.prepare_content("application/json")
+        luci.http.write_json({success = false, error = translate("Cannot write to log file")})
+    end
 end
+
