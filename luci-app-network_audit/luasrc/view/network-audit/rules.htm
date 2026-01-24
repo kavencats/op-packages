@@ -1,0 +1,228 @@
+<%+header%>
+
+<div class="cbi-map" id="cbi-network-audit-rules">
+    <h2 name="content"><%:Network Audit Rules%></h2>
+    
+    <div class="cbi-map-descr">
+        <p><%:View and manage current network audit rules and iptables chains.%></p>
+    </div>
+    
+    <fieldset class="cbi-section">
+        <legend><%:Active Rules%></legend>
+        <div class="cbi-section-node">
+            <div class="cbi-value">
+                <label class="cbi-value-title"><%:IPTables Chains%>:</label>
+                <div class="cbi-value-field">
+                    <button class="cbi-button cbi-button-reload" id="btn-refresh-rules"><%:Refresh Rules%></button>
+                </div>
+            </div>
+            
+            <div class="cbi-value">
+                <div class="cbi-value-field">
+                    <div class="tabs">
+                        <ul class="cbi-tabmenu">
+                            <li class="cbi-tab" id="tab-input"><a href="#input-rules"><%:INPUT Chain%></a></li>
+                            <li class="cbi-tab" id="tab-forward"><a href="#forward-rules"><%:FORWARD Chain%></a></li>
+                            <li class="cbi-tab" id="tab-output"><a href="#output-rules"><%:OUTPUT Chain%></a></li>
+                        </ul>
+                        
+                        <div class="cbi-tabcontent" id="input-rules">
+                            <pre id="input-rules-content" style="background: #f5f5f5; padding: 10px; border: 1px solid #ddd; overflow: auto; max-height: 300px;"></pre>
+                        </div>
+                        
+                        <div class="cbi-tabcontent" id="forward-rules" style="display: none">
+                            <pre id="forward-rules-content" style="background: #f5f5f5; padding: 10px; border: 1px solid #ddd; overflow: auto; max-height: 300px;"></pre>
+                        </div>
+                        
+                        <div class="cbi-tabcontent" id="output-rules" style="display: none">
+                            <pre id="output-rules-content" style="background: #f5f5f5; padding: 10px; border: 1px solid #ddd; overflow: auto; max-height: 300px;"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    
+    <fieldset class="cbi-section">
+        <legend><%:Connection Statistics%></legend>
+        <div class="cbi-section-node">
+            <div class="cbi-value">
+                <label class="cbi-value-title"><%:Total Connections%>:</label>
+                <div class="cbi-value-field">
+                    <span id="total-connections">-</span>
+                </div>
+            </div>
+            <div class="cbi-value">
+                <label class="cbi-value-title"><%:TCP Connections%>:</label>
+                <div class="cbi-value-field">
+                    <span id="tcp-connections">-</span>
+                </div>
+            </div>
+            <div class="cbi-value">
+                <label class="cbi-value-title"><%:UDP Connections%>:</label>
+                <div class="cbi-value-field">
+                    <span id="udp-connections">-</span>
+                </div>
+            </div>
+            <div class="cbi-value">
+                <label class="cbi-value-title"><%:Blocked Count%>:</label>
+                <div class="cbi-value-field">
+                    <span id="blocked-count">-</span>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+<script type="text/javascript">
+    //<![CDATA[
+    function refreshRules() {
+        // Get INPUT chain rules
+        XHR.post('/cgi-bin/luci/admin/ubus', {
+            json: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'call',
+                params: [
+                    '00000000000000000000000000000000',
+                    'file',
+                    'exec',
+                    {
+                        command: 'iptables',
+                        params: ['-L', 'NETWORK_AUDIT_INPUT', '-vn', '--line-numbers']
+                    }
+                ]
+            })
+        }, function(x, data) {
+            if (data) {
+                var resp = JSON.parse(data);
+                var content = document.getElementById('input-rules-content');
+                if (content && resp.result && resp.result[1] && resp.result[1].stdout) {
+                    content.textContent = resp.result[1].stdout || '<%:No rules found%>';
+                }
+            }
+        });
+        
+        // Get FORWARD chain rules
+        XHR.post('/cgi-bin/luci/admin/ubus', {
+            json: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'call',
+                params: [
+                    '00000000000000000000000000000000',
+                    'file',
+                    'exec',
+                    {
+                        command: 'iptables',
+                        params: ['-L', 'NETWORK_AUDIT_FORWARD', '-vn', '--line-numbers']
+                    }
+                ]
+            })
+        }, function(x, data) {
+            if (data) {
+                var resp = JSON.parse(data);
+                var content = document.getElementById('forward-rules-content');
+                if (content && resp.result && resp.result[1] && resp.result[1].stdout) {
+                    content.textContent = resp.result[1].stdout || '<%:No rules found%>';
+                }
+            }
+        });
+        
+        // Get OUTPUT chain rules
+        XHR.post('/cgi-bin/luci/admin/ubus', {
+            json: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'call',
+                params: [
+                    '00000000000000000000000000000000',
+                    'file',
+                    'exec',
+                    {
+                        command: 'iptables',
+                        params: ['-L', 'NETWORK_AUDIT_OUTPUT', '-vn', '--line-numbers']
+                    }
+                ]
+            })
+        }, function(x, data) {
+            if (data) {
+                var resp = JSON.parse(data);
+                var content = document.getElementById('output-rules-content');
+                if (content && resp.result && resp.result[1] && resp.result[1].stdout) {
+                    content.textContent = resp.result[1].stdout || '<%:No rules found%>';
+                }
+            }
+        });
+        
+        // Get connection statistics
+        XHR.post('/cgi-bin/luci/admin/ubus', {
+            json: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'call',
+                params: [
+                    '00000000000000000000000000000000',
+                    'file',
+                    'exec',
+                    {
+                        command: 'conntrack',
+                        params: ['-L', '-n']
+                    }
+                ]
+            })
+        }, function(x, data) {
+            if (data) {
+                var resp = JSON.parse(data);
+                if (resp.result && resp.result[1] && resp.result[1].stdout) {
+                    var output = resp.result[1].stdout;
+                    var lines = output.split('\n');
+                    
+                    var total = lines.length - 1; // Subtract header
+                    var tcp = output.split('\n').filter(function(line) {
+                        return line.includes('tcp');
+                    }).length;
+                    var udp = output.split('\n').filter(function(line) {
+                        return line.includes('udp');
+                    }).length;
+                    
+                    document.getElementById('total-connections').textContent = total;
+                    document.getElementById('tcp-connections').textContent = tcp;
+                    document.getElementById('udp-connections').textContent = udp;
+                }
+            }
+        });
+    }
+    
+    // Tab switching
+    document.addEventListener('DOMContentLoaded', function() {
+        refreshRules();
+        
+        document.getElementById('btn-refresh-rules').addEventListener('click', refreshRules);
+        
+        // Tab switching
+        var tabs = document.querySelectorAll('.cbi-tab');
+        tabs.forEach(function(tab) {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Hide all tab content
+                document.querySelectorAll('.cbi-tabcontent').forEach(function(content) {
+                    content.style.display = 'none';
+                });
+                
+                // Remove active class from all tabs
+                tabs.forEach(function(t) {
+                    t.classList.remove('cbi-tab-disabled');
+                });
+                
+                // Show selected tab content
+                var targetId = this.querySelector('a').getAttribute('href').substring(1);
+                document.getElementById(targetId).style.display = 'block';
+                this.classList.add('cbi-tab-disabled');
+            });
+        });
+        
+        // Auto-refresh every 30 seconds
+        setInterval(refreshRules, 30000);
+    });
+    //]]>
+</script>
+
+<%+footer%>
