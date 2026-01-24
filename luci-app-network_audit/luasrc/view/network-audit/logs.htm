@@ -19,7 +19,7 @@
         <div class="cbi-section-node">
             <div class="cbi-value">
                 <div class="cbi-value-field">
-                    <textarea id="log-content" style="width: 100%; height: 400px; font-family: monospace; font-size: 12px;" readonly="readonly" wrap="off"></textarea>
+                    <textarea id="log-content" style="width: 100%; height: 400px; font-family: monospace; font-size: 12px; white-space: pre; overflow-x: auto;" readonly="readonly"></textarea>
                 </div>
             </div>
         </div>
@@ -32,7 +32,7 @@
     </fieldset>
     
     <fieldset class="cbi-section">
-        <legend><%:Recent Connections%></legend>
+        <legend><%:Connection Monitor%></legend>
         <div class="cbi-section-node">
             <div class="table" style="width: 100%">
                 <div class="tr table-titles">
@@ -40,10 +40,12 @@
                     <div class="th" style="width: 20%"><%:Source%></div>
                     <div class="th" style="width: 20%"><%:Destination%></div>
                     <div class="th" style="width: 20%"><%:State%></div>
-                    <div class="th" style="width: 20%"><%:Time%></div>
+                    <div class="th" style="width: 20%"><%:Age%></div>
                 </div>
                 <div id="connections-list" class="tbody">
-                    <!-- Connections will be populated by JavaScript -->
+                    <div class="tr">
+                        <div class="td" colspan="5" style="text-align: center"><%:Loading...%></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -53,7 +55,7 @@
 <script type="text/javascript">
     //<![CDATA[
     function refreshLogs() {
-        XHR.get('<%=url("admin/services/network-audit/get_logs")%>', null,
+        XHR.get('<%=luci.dispatcher.build_url("admin/services/network-audit/get_logs")%>', null,
             function(x, data) {
                 var logTextarea = document.getElementById('log-content');
                 if (logTextarea && data) {
@@ -64,44 +66,49 @@
         );
         
         // Refresh connections
-        XHR.post('/cgi-bin/luci/admin/ubus', {
+        XHR.post('/cgi-bin/luci/rpc/uci', {
             json: JSON.stringify({
-                jsonrpc: '2.0',
-                method: 'call',
-                params: [
-                    '00000000000000000000000000000000',
-                    'file',
-                    'exec',
-                    {
-                        command: 'conntrack',
-                        params: ['-L', '-n', '-o', 'extended']
-                    }
-                ]
+                method: 'exec',
+                params: {
+                    command: 'conntrack',
+                    params: ['-L', '-n']
+                }
             })
         }, function(x, data) {
             if (data) {
-                var resp = JSON.parse(data);
-                var connectionsList = document.getElementById('connections-list');
-                if (resp.result && resp.result[1] && resp.result[1].stdout && connectionsList) {
-                    var lines = resp.result[1].stdout.split('\n').slice(0, 20);
-                    var html = '';
-                    
-                    lines.forEach(function(line) {
-                        if (line.trim()) {
-                            var parts = line.split(/\s+/);
-                            if (parts.length >= 10) {
-                                html += '<div class="tr">' +
-                                    '<div class="td">' + (parts[0] || '-') + '</div>' +
-                                    '<div class="td">' + (parts[3] || '-') + '</div>' +
-                                    '<div class="td">' + (parts[5] || '-') + '</div>' +
-                                    '<div class="td">' + (parts[9] || '-') + '</div>' +
-                                    '<div class="td">' + (new Date().toLocaleTimeString()) + '</div>' +
-                                '</div>';
+                try {
+                    var resp = JSON.parse(data);
+                    var connectionsList = document.getElementById('connections-list');
+                    if (connectionsList && resp && resp.result) {
+                        var lines = resp.result.split('\\n');
+                        var html = '';
+                        var count = 0;
+                        
+                        for (var i = 0; i < lines.length && count < 10; i++) {
+                            var line = lines[i].trim();
+                            if (line && line.includes('ESTABLISHED')) {
+                                var parts = line.split(/\s+/);
+                                if (parts.length >= 6) {
+                                    html += '<div class="tr">' +
+                                        '<div class="td">' + (parts[0] || '-') + '</div>' +
+                                        '<div class="td">' + (parts[3] || '-') + '</div>' +
+                                        '<div class="td">' + (parts[5] || '-') + '</div>' +
+                                        '<div class="td">ESTABLISHED</div>' +
+                                        '<div class="td">-</div>' +
+                                    '</div>';
+                                    count++;
+                                }
                             }
                         }
-                    });
-                    
-                    connectionsList.innerHTML = html || '<div class="tr"><div class="td" colspan="5"><%:No connections found%></div></div>';
+                        
+                        if (html === '') {
+                            html = '<div class="tr"><div class="td" colspan="5" style="text-align: center"><%:No active connections found%></div></div>';
+                        }
+                        
+                        connectionsList.innerHTML = html;
+                    }
+                } catch(e) {
+                    console.error('Failed to parse connections:', e);
                 }
             }
         });
@@ -109,7 +116,7 @@
     
     function clearLogs() {
         if (confirm('<%:Are you sure you want to clear all logs?%>')) {
-            XHR.get('<%=url("admin/services/network-audit/clear_logs")%>', null,
+            XHR.get('<%=luci.dispatcher.build_url("admin/services/network-audit/clear_logs")%>', null,
                 function() {
                     refreshLogs();
                 }
@@ -119,11 +126,16 @@
     
     function downloadLogs() {
         var logContent = document.getElementById('log-content').value;
-        var blob = new Blob([logContent], {type: 'text/plain'});
+        if (!logContent || logContent.trim() === '') {
+            alert('<%:No log content to download%>');
+            return;
+        }
+        
+        var blob = new Blob([logContent], {type: 'text/plain;charset=utf-8'});
         var url = window.URL.createObjectURL(blob);
         var a = document.createElement('a');
         a.href = url;
-        a.download = 'network-audit-' + new Date().toISOString().split('T')[0] + '.log';
+        a.download = 'network-audit-' + new Date().toISOString().slice(0, 10) + '.log';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -137,8 +149,11 @@
         document.getElementById('btn-clear').addEventListener('click', clearLogs);
         document.getElementById('btn-download').addEventListener('click', downloadLogs);
         
-        // Auto-refresh every 10 seconds
-        setInterval(refreshLogs, 10000);
+        var refreshInterval = setInterval(refreshLogs, 10000);
+        
+        window.addEventListener('beforeunload', function() {
+            clearInterval(refreshInterval);
+        });
     });
     //]]>
 </script>
