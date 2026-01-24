@@ -160,3 +160,90 @@ msgstr "否"
 
 msgid "Real-time network traffic auditing and monitoring."
 msgstr "实时网络流量审计和监控。"
+
+msgid "Network Audit Logs"
+msgstr "网络审计日志"
+
+msgid "View network audit logs and monitoring information."
+msgstr "查看网络审计日志和监控信息。"
+
+msgid "Log Viewer"
+msgstr "日志查看器"
+
+msgid "Log File"
+msgstr "日志文件"
+
+msgid "Refresh"
+msgstr "刷新"
+
+msgid "Clear Logs"
+msgstr "清除日志"
+
+msgid "Download"
+msgstr "下载"
+
+msgid "Are you sure you want to clear all logs?"
+msgstr "确定要清除所有日志吗？"
+
+msgid "Recent Connections"
+msgstr "最近连接"
+
+msgid "Protocol"
+msgstr "协议"
+
+msgid "Source"
+msgstr "源地址"
+
+msgid "Destination"
+msgstr "目标地址"
+
+msgid "State"
+msgstr "状态"
+
+msgid "Time"
+msgstr "时间"
+
+msgid "No connections found"
+msgstr "未找到连接"
+
+msgid "Network Audit Rules"
+msgstr "网络审计规则"
+
+msgid "View and manage current network audit rules and iptables chains."
+msgstr "查看和管理当前的网络审计规则和 iptables 链。"
+
+msgid "Active Rules"
+msgstr "活动规则"
+
+msgid "IPTables Chains"
+msgstr "IPTables 链"
+
+msgid "Refresh Rules"
+msgstr "刷新规则"
+
+msgid "INPUT Chain"
+msgstr "INPUT 链"
+
+msgid "FORWARD Chain"
+msgstr "FORWARD 链"
+
+msgid "OUTPUT Chain"
+msgstr "OUTPUT 链"
+
+msgid "No rules found"
+msgstr "未找到规则"
+
+msgid "Connection Statistics"
+msgstr "连接统计"
+
+msgid "Total Connections"
+msgstr "总连接数"
+
+msgid "TCP Connections"
+msgstr "TCP 连接"
+
+msgid "UDP Connections"
+msgstr "UDP 连接"
+
+msgid "Blocked Count"
+msgstr "阻止计数"
