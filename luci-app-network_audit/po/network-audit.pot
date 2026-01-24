@@ -247,3 +247,24 @@ msgstr ""
 
 msgid "Blocked Count"
 msgstr ""
+
+msgid "View Rules"
+msgstr ""
+
+msgid "No log file found. Service may not be running."
+msgstr ""
+
+msgid "Logs cleared successfully"
+msgstr ""
+
+msgid "Cannot write to log file"
+msgstr ""
+
+msgid "No active connections found"
+msgstr ""
+
+msgid "No log content to download"
+msgstr ""
+
+msgid "Rules Count"
+msgstr ""
