@@ -1,0 +1,140 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+
+COMMAND="$1"
+
+case "$COMMAND" in
+    get_status)
+        json_init
+        
+        # 检查服务状态
+        if [ -f /var/run/network-audit.pid ]; then
+            if kill -0 $(cat /var/run/network-audit.pid) 2>/dev/null; then
+                service_status="running"
+            else
+                service_status="stopped"
+            fi
+        else
+            service_status="stopped"
+        fi
+        
+        # 获取连接数
+        conn_count=0
+        if command -v conntrack >/dev/null 2>&1; then
+            conn_count=$(conntrack -L 2>/dev/null | wc -l)
+            # 减去表头行
+            conn_count=$((conn_count - 2))
+            [ $conn_count -lt 0 ] && conn_count=0
+        fi
+        
+        # 获取带宽
+        rx_total=0
+        tx_total=0
+        for iface in /sys/class/net/*; do
+            iface_name=$(basename "$iface")
+            [ "$iface_name" = "lo" ] && continue
+            
+            if [ -f "$iface/statistics/rx_bytes" ] && [ -f "$iface/statistics/tx_bytes" ]; then
+                rx=$(cat "$iface/statistics/rx_bytes" 2>/dev/null || echo 0)
+                tx=$(cat "$iface/statistics/tx_bytes" 2>/dev/null || echo 0)
+                rx_total=$((rx_total + rx))
+                tx_total=$((tx_total + tx))
+            fi
+        done
+        
+        # 获取阻止计数
+        blocked_count=0
+        if command -v iptables >/dev/null 2>&1; then
+            blocked_count=$(iptables -L FORWARD -n -v 2>/dev/null | grep -c "DROP\|REJECT" || echo 0)
+        fi
+        
+        json_add_string "service" "$service_status"
+        json_add_int "connections" "$conn_count"
+        json_add_int "rx_bytes" "$rx_total"
+        json_add_int "tx_bytes" "$tx_total"
+        json_add_int "blocked" "$blocked_count"
+        json_add_string "timestamp" "$(date '+%Y-%m-%d %H:%M:%S')"
+        json_dump
+        ;;
+    
+    get_traffic)
+        json_init
+        json_add_object "interfaces"
+        
+        # 获取接口流量
+        for iface in /sys/class/net/*; do
+            iface_name=$(basename "$iface")
+            [ "$iface_name" = "lo" ] && continue
+            
+            if [ -f "$iface/statistics/rx_bytes" ] && [ -f "$iface/statistics/tx_bytes" ]; then
+                rx=$(cat "$iface/statistics/rx_bytes" 2>/dev/null || echo 0)
+                tx=$(cat "$iface/statistics/tx_bytes" 2>/dev/null || echo 0)
+                
+                json_add_object "$iface_name"
+                json_add_int "rx" "$rx"
+                json_add_int "tx" "$tx"
+                json_close_object
+            fi
+        done
+        
+        json_close_object
+        json_dump
+        ;;
+    
+    get_connections)
+        json_init
+        json_add_array "connections"
+        
+        if command -v conntrack >/dev/null 2>&1; then
+            conntrack -L 2>/dev/null | while read -r line; do
+                # 跳过空行和表头
+                [ -z "$line" ] && continue
+                echo "$line" | grep -q "^.*STATE=" || continue
+                
+                # 解析连接信息
+                proto=$(echo "$line" | grep -o "tcp\|udp\|icmp" | head -1)
+                src=$(echo "$line" | grep -o "src=[^ ]*" | cut -d= -f2)
+                dst=$(echo "$line" | grep -o "dst=[^ ]*" | cut -d= -f2)
+                sport=$(echo "$line" | grep -o "sport=[^ ]*" | cut -d= -f2)
+                dport=$(echo "$line" | grep -o "dport=[^ ]*" | cut -d= -f2)
+                state=$(echo "$line" | grep -o "STATE=[^ ]*" | cut -d= -f2)
+                packets=$(echo "$line" | grep -o "packets=[^ ]*" | cut -d= -f2 | head -1)
+                bytes=$(echo "$line" | grep -o "bytes=[^ ]*" | cut -d= -f2 | head -1)
+                
+                [ -n "$proto" ] && [ -n "$src" ] && [ -n "$dst" ] || continue
+                
+                json_add_object
+                json_add_string "proto" "$proto"
+                json_add_string "src" "$src"
+                json_add_string "dst" "$dst"
+                json_add_string "sport" "$sport"
+                json_add_string "dport" "$dport"
+                json_add_string "state" "$state"
+                json_add_string "packets" "$packets"
+                json_add_string "bytes" "$bytes"
+                json_close_object
+            done
+        fi
+        
+        json_close_array
+        json_dump
+        ;;
+    
+    clear_logs)
+        echo "" > /var/log/network-audit.log 2>/dev/null || true
+        echo "" > /var/log/network-audit/audit.log 2>/dev/null || true
+        
+        json_init
+        json_add_boolean "success" 1
+        json_add_string "message" "Logs cleared successfully"
+        json_dump
+        ;;
+    
+    *)
+        json_init
+        json_add_boolean "success" 0
+        json_add_string "error" "Unknown command: $COMMAND"
+        json_dump
+        ;;
+esac

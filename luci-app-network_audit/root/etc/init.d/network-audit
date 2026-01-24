@@ -1,0 +1,100 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+STOP=10
+USE_PROCD=1
+NAME=network-audit
+PROG=/usr/bin/network-audit
+LOGFILE=/var/log/network-audit.log
+CONFIGFILE=/etc/config/network-audit
+
+EXTRA_COMMANDS="rules clean"
+EXTRA_HELP="        rules   Apply iptables rules
+        clean   Clean iptables rules"
+
+start_service() {
+    procd_open_instance
+    procd_set_param command "$PROG"
+    procd_set_param stdout 1
+    procd_set_param stderr 1
+    procd_set_param respawn
+    procd_set_param file "$CONFIGFILE"
+    procd_close_instance
+    
+    # 创建日志目录
+    mkdir -p /var/log/network-audit/ 2>/dev/null
+    
+    # 初始化iptables规则
+    rules
+    
+    logger -t network-audit "Network audit service started"
+}
+
+stop_service() {
+    # 清理iptables规则
+    clean
+    
+    logger -t network-audit "Network audit service stopped"
+}
+
+reload_service() {
+    stop
+    sleep 1
+    start
+}
+
+rules() {
+    config_load network-audit
+    config_get_bool enabled general enabled 0
+    
+    if [ "$enabled" = "1" ]; then
+        # 创建日志链（如果不存在）
+        iptables -N NETWORK_AUDIT_LOG 2>/dev/null || iptables -F NETWORK_AUDIT_LOG 2>/dev/null
+        
+        # 清空现有规则
+        iptables -F NETWORK_AUDIT_LOG 2>/dev/null
+        
+        # 记录新连接
+        iptables -A NETWORK_AUDIT_LOG -m state --state NEW -j LOG \
+            --log-level info \
+            --log-prefix "NET_AUDIT_NEW: " \
+            2>/dev/null || true
+        
+        # 记录丢弃的数据包
+        iptables -A NETWORK_AUDIT_LOG -m limit --limit 10/min -j LOG \
+            --log-level warning \
+            --log-prefix "NET_AUDIT_DROP: " \
+            2>/dev/null || true
+        
+        # 从INPUT和FORWARD链中删除已有规则
+        iptables -D INPUT -j NETWORK_AUDIT_LOG 2>/dev/null || true
+        iptables -D FORWARD -j NETWORK_AUDIT_LOG 2>/dev/null || true
+        
+        # 插入到INPUT和FORWARD链
+        iptables -I INPUT 1 -j NETWORK_AUDIT_LOG 2>/dev/null || true
+        iptables -I FORWARD 1 -j NETWORK_AUDIT_LOG 2>/dev/null || true
+        
+        logger -t network-audit "Network audit rules applied"
+    fi
+}
+
+clean() {
+    # 从INPUT和FORWARD链中删除规则
+    iptables -D INPUT -j NETWORK_AUDIT_LOG 2>/dev/null || true
+    iptables -D FORWARD -j NETWORK_AUDIT_LOG 2>/dev/null || true
+    
+    # 清理自定义链
+    iptables -F NETWORK_AUDIT_LOG 2>/dev/null || true
+    iptables -X NETWORK_AUDIT_LOG 2>/dev/null || true
+    
+    logger -t network-audit "Network audit rules cleaned"
+}
+
+boot() {
+    config_load network-audit
+    config_get_bool enabled general enabled 0
+    
+    if [ "$enabled" = "1" ]; then
+        start
+    fi
+}

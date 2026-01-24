@@ -1,0 +1,220 @@
+#!/bin/sh
+
+# 网络审计主程序
+# 用于实时监控和记录网络活动
+
+CONFIG_FILE="/etc/config/network-audit"
+LOG_FILE="/var/log/network-audit/audit.log"
+PID_FILE="/var/run/network-audit.pid"
+
+# 确保日志目录存在
+mkdir -p /var/log/network-audit/ 2>/dev/null
+
+# 加载配置
+load_config() {
+    [ -f "$CONFIG_FILE" ] || return 1
+    
+    # 从UCI配置读取设置
+    enabled=$(uci -q get network-audit.general.enabled)
+    log_level=$(uci -q get network-audit.general.log_level)
+    monitor_interval=$(uci -q get network-audit.general.monitor_interval)
+    
+    [ -z "$enabled" ] && enabled="0"
+    [ -z "$log_level" ] && log_level="2"
+    [ -z "$monitor_interval" ] && monitor_interval="5"
+    
+    return 0
+}
+
+# 记录日志
+log_message() {
+    local level="$1"
+    local message="$2"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    
+    # 根据日志级别过滤
+    case "$log_level" in
+        "0") return ;;  # 无日志
+        "1") [ "$level" != "ERROR" ] && return ;;  # 仅错误
+        "2") [ "$level" = "DEBUG" ] && return ;;  # 无调试
+        "3") ;;  # 所有日志
+        *) [ "$level" = "DEBUG" ] && return ;;  # 默认无调试
+    esac
+    
+    echo "[$timestamp] [$level] $message" >> "$LOG_FILE"
+    
+    # 如果启用了syslog，也记录到系统日志
+    if [ "$(uci -q get network-audit.logs.syslog)" = "1" ]; then
+        logger -t "network-audit" "$level: $message"
+    fi
+}
+
+# 监控网络连接
+monitor_connections() {
+    if ! command -v conntrack >/dev/null 2>&1; then
+        log_message "ERROR" "conntrack not found. Install conntrack-tools package."
+        return 1
+    fi
+    
+    log_message "INFO" "Starting network connection monitoring"
+    
+    while true; do
+        if [ "$enabled" != "1" ]; then
+            sleep 5
+            continue
+        fi
+        
+        # 获取新连接
+        conntrack -E -e NEW 2>/dev/null | while read -r event; do
+            [ -z "$event" ] && continue
+            
+            # 解析事件
+            timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+            src=$(echo "$event" | grep -o "src=[^ ]*" | cut -d= -f2)
+            dst=$(echo "$event" | grep -o "dst=[^ ]*" | cut -d= -f2)
+            sport=$(echo "$event" | grep -o "sport=[^ ]*" | cut -d= -f2)
+            dport=$(echo "$event" | grep -o "dport=[^ ]*" | cut -d= -f2)
+            proto=$(echo "$event" | grep -o "protocol=[^ ]*" | cut -d= -f2)
+            
+            if [ -n "$src" ] && [ -n "$dst" ]; then
+                log_message "INFO" "New connection: $src:$sport -> $dst:$dport ($proto)"
+            fi
+        done
+        
+        sleep "$monitor_interval"
+    done
+}
+
+# 监控带宽使用
+monitor_bandwidth() {
+    log_message "INFO" "Starting bandwidth monitoring"
+    
+    declare -A last_rx
+    declare -A last_tx
+    
+    while true; do
+        if [ "$enabled" != "1" ]; then
+            sleep 60
+            continue
+        fi
+        
+        for iface in /sys/class/net/*; do
+            iface_name=$(basename "$iface")
+            [ "$iface_name" = "lo" ] && continue
+            
+            if [ -f "$iface/statistics/rx_bytes" ] && [ -f "$iface/statistics/tx_bytes" ]; then
+                current_rx=$(cat "$iface/statistics/rx_bytes" 2>/dev/null || echo 0)
+                current_tx=$(cat "$iface/statistics/tx_bytes" 2>/dev/null || echo 0)
+                
+                if [ -n "${last_rx[$iface_name]}" ] && [ -n "${last_tx[$iface_name]}" ]; then
+                    rx_diff=$((current_rx - last_rx[$iface_name]))
+                    tx_diff=$((current_tx - last_tx[$iface_name]))
+                    
+                    if [ $((rx_diff + tx_diff)) -gt 0 ]; then
+                        log_message "DEBUG" "Interface $iface_name: RX=${rx_diff}B, TX=${tx_diff}B"
+                    fi
+                fi
+                
+                last_rx["$iface_name"]=$current_rx
+                last_tx["$iface_name"]=$current_tx
+            fi
+        done
+        
+        sleep 60
+    done
+}
+
+# 清理旧日志
+cleanup_old_logs() {
+    local keep_days=$(uci -q get network-audit.logs.keep_logs || echo "7")
+    local log_dir="/var/log/network-audit"
+    
+    find "$log_dir" -name "*.log.*" -type f -mtime +"$keep_days" -delete 2>/dev/null || true
+}
+
+# 主函数
+main() {
+    # 检查配置
+    if ! load_config; then
+        echo "Error: Cannot load configuration from $CONFIG_FILE"
+        exit 1
+    fi
+    
+    # 检查是否启用
+    if [ "$enabled" != "1" ]; then
+        echo "Network audit is disabled. Enable it in Luci configuration."
+        exit 0
+    fi
+    
+    # 创建PID文件
+    echo $$ > "$PID_FILE"
+    trap "rm -f $PID_FILE; exit 0" INT TERM EXIT
+    
+    log_message "INFO" "Network audit daemon started (PID: $$)"
+    
+    # 启动监控进程
+    monitor_connections &
+    conn_pid=$!
+    
+    monitor_bandwidth &
+    bw_pid=$!
+    
+    # 主循环
+    while true; do
+        # 重新加载配置
+        load_config
+        
+        # 清理旧日志
+        cleanup_old_logs
+        
+        # 检查子进程
+        if ! kill -0 $conn_pid 2>/dev/null; then
+            log_message "ERROR" "Connection monitor died, restarting..."
+            monitor_connections &
+            conn_pid=$!
+        fi
+        
+        if ! kill -0 $bw_pid 2>/dev/null; then
+            log_message "ERROR" "Bandwidth monitor died, restarting..."
+            monitor_bandwidth &
+            bw_pid=$!
+        fi
+        
+        sleep 300
+    done
+}
+
+# 处理命令行参数
+case "$1" in
+    start)
+        if [ -f "$PID_FILE" ] && kill -0 $(cat "$PID_FILE") 2>/dev/null; then
+            echo "Service is already running"
+            exit 0
+        fi
+        main &
+        ;;
+    stop)
+        if [ -f "$PID_FILE" ]; then
+            kill $(cat "$PID_FILE") 2>/dev/null && rm -f "$PID_FILE"
+            echo "Service stopped"
+        else
+            echo "Service is not running"
+        fi
+        ;;
+    restart)
+        $0 stop
+        sleep 2
+        $0 start
+        ;;
+    status)
+        if [ -f "$PID_FILE" ] && kill -0 $(cat "$PID_FILE") 2>/dev/null; then
+            echo "Service is running (PID: $(cat $PID_FILE))"
+        else
+            echo "Service is not running"
+        fi
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+        ;;
+esac
