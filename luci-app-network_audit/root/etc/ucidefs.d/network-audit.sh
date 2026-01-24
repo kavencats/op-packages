@@ -3,6 +3,22 @@
 
 . /lib/functions.sh
 
+cleanup_on_remove() {
+    # 这个函数在包被移除时调用
+    echo "Preparing network-audit for removal..."
+    
+    # 如果初始化脚本还存在，先调用清理
+    if [ -x "/etc/init.d/network-audit" ]; then
+        /etc/init.d/network-audit cleanup
+    fi
+    
+    # 清理配置文件
+    uci delete network-audit 2>/dev/null
+    uci commit network-audit 2>/dev/null
+    
+    return 0
+}
+
 uci_defaults_network_audit() {
     # Ensure config file exists
     touch /etc/config/network-audit
@@ -58,6 +74,11 @@ stop() {
     return 0
 }
 
+remove() {
+    cleanup_on_remove
+    return 0
+}
+
 case "$1" in
     boot)
         boot
@@ -68,8 +89,11 @@ case "$1" in
     stop)
         stop
         ;;
+    remove)
+        remove
+        ;;
     *)
-        echo "Usage: $0 {boot|start|stop}"
+        echo "Usage: $0 {boot|start|stop|remove}"
         exit 1
         ;;
 esac
