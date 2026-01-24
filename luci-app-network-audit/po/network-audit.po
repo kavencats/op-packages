@@ -1,0 +1,357 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Network Audit"
+msgstr ""
+
+msgid "Network Audit and Monitoring"
+msgstr ""
+
+msgid "Configure general settings for network auditing and monitoring."
+msgstr ""
+
+msgid "General Settings"
+msgstr ""
+
+msgid "Traffic Monitor"
+msgstr ""
+
+msgid "Access Control"
+msgstr ""
+
+msgid "Audit Logs"
+msgstr ""
+
+msgid "Real-time Status"
+msgstr ""
+
+msgid "Enable Network Audit"
+msgstr ""
+
+msgid "Enable network traffic auditing and monitoring"
+msgstr ""
+
+msgid "Log Traffic"
+msgstr ""
+
+msgid "Log all network traffic information"
+msgstr ""
+
+msgid "Log Level"
+msgstr ""
+
+msgid "Set the verbosity level for logging"
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid "Minimal"
+msgstr ""
+
+msgid "Normal"
+msgstr ""
+
+msgid "Detailed"
+msgstr ""
+
+msgid "Maximum Log Size (MB)"
+msgstr ""
+
+msgid "Maximum size of audit log file"
+msgstr ""
+
+msgid "Real-time Monitoring"
+msgstr ""
+
+msgid "Enable real-time network connection monitoring"
+msgstr ""
+
+msgid "Monitor Interval (seconds)"
+msgstr ""
+
+msgid "Exclude IP Addresses"
+msgstr ""
+
+msgid "IP addresses to exclude from monitoring (one per line)"
+msgstr ""
+
+msgid "Exclude Ports"
+msgstr ""
+
+msgid "Ports to exclude from monitoring (one per line)"
+msgstr ""
+
+msgid "Configure traffic monitoring and bandwidth usage tracking."
+msgstr ""
+
+msgid "Traffic Settings"
+msgstr ""
+
+msgid "Monitor All Interfaces"
+msgstr ""
+
+msgid "Monitor traffic on all network interfaces"
+msgstr ""
+
+msgid "Interfaces to Monitor"
+msgstr ""
+
+msgid "Network interfaces to monitor (if not monitoring all)"
+msgstr ""
+
+msgid "Track Bandwidth Usage"
+msgstr ""
+
+msgid "Track historical bandwidth usage"
+msgstr ""
+
+msgid "History Duration (hours)"
+msgstr ""
+
+msgid "Enable Bandwidth Alerts"
+msgstr ""
+
+msgid "Send alerts when bandwidth exceeds threshold"
+msgstr ""
+
+msgid "Bandwidth Threshold (Mbps)"
+msgstr ""
+
+msgid "Track Protocol Usage"
+msgstr ""
+
+msgid "Track traffic by protocol (TCP/UDP/ICMP/etc)"
+msgstr ""
+
+msgid "Track Geographic Locations"
+msgstr ""
+
+msgid "Attempt to track traffic by country (requires GeoIP database)"
+msgstr ""
+
+msgid "Configure access control rules and filtering."
+msgstr ""
+
+msgid "Access Control Settings"
+msgstr ""
+
+msgid "Enable Filtering"
+msgstr ""
+
+msgid "Enable network access filtering"
+msgstr ""
+
+msgid "Block by Default"
+msgstr ""
+
+msgid "Block all traffic by default, allow only specified rules"
+msgstr ""
+
+msgid "IP Blacklist"
+msgstr ""
+
+msgid "IP addresses to block"
+msgstr ""
+
+msgid "IP Address"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Port Restrictions"
+msgstr ""
+
+msgid "Restrict access to specific ports"
+msgstr ""
+
+msgid "Port"
+msgstr ""
+
+msgid "Action"
+msgstr ""
+
+msgid "Allow"
+msgstr ""
+
+msgid "Deny"
+msgstr ""
+
+msgid "Protocol"
+msgstr ""
+
+msgid "Time Restrictions"
+msgstr ""
+
+msgid "Restrict access during specific time periods"
+msgstr ""
+
+msgid "Start Time (HH:MM)"
+msgstr ""
+
+msgid "End Time (HH:MM)"
+msgstr ""
+
+msgid "Days of Week"
+msgstr ""
+
+msgid "Monday"
+msgstr ""
+
+msgid "Tuesday"
+msgstr ""
+
+msgid "Wednesday"
+msgstr ""
+
+msgid "Thursday"
+msgstr ""
+
+msgid "Friday"
+msgstr ""
+
+msgid "Saturday"
+msgstr ""
+
+msgid "Sunday"
+msgstr ""
+
+msgid "Configure logging and log viewing settings."
+msgstr ""
+
+msgid "Log Settings"
+msgstr ""
+
+msgid "Enable Logging"
+msgstr ""
+
+msgid "Enable audit log recording"
+msgstr ""
+
+msgid "Log File Path"
+msgstr ""
+
+msgid "Log New Connections"
+msgstr ""
+
+msgid "Log all new network connections"
+msgstr ""
+
+msgid "Log Dropped Packets"
+msgstr ""
+
+msgid "Log all dropped/blocked packets"
+msgstr ""
+
+msgid "Log Bandwidth Usage"
+msgstr ""
+
+msgid "Log periodic bandwidth usage statistics"
+msgstr ""
+
+msgid "Log Interval (minutes)"
+msgstr ""
+
+msgid "Send to System Log"
+msgstr ""
+
+msgid "Also send audit events to system log (syslog)"
+msgstr ""
+
+msgid "Auto Rotate Logs"
+msgstr ""
+
+msgid "Automatically rotate log files when they get too large"
+msgstr ""
+
+msgid "Keep Logs (days)"
+msgstr ""
+
+msgid "Real-time network monitoring and status information"
+msgstr ""
+
+msgid "System Status"
+msgstr ""
+
+msgid "Audit Service"
+msgstr ""
+
+msgid "Active Connections"
+msgstr ""
+
+msgid "Total Bandwidth (RX/TX)"
+msgstr ""
+
+msgid "Blocked Today"
+msgstr ""
+
+msgid "Interface Traffic"
+msgstr ""
+
+msgid "Interface"
+msgstr ""
+
+msgid "Received"
+msgstr ""
+
+msgid "Transmitted"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+msgid "Source"
+msgstr ""
+
+msgid "Dest"
+msgstr ""
+
+msgid "State"
+msgstr ""
+
+msgid "Bytes"
+msgstr ""
+
+msgid "Auto Refresh"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Running"
+msgstr ""
+
+msgid "Stopped"
+msgstr ""
+
+msgid "TCP"
+msgstr ""
+
+msgid "UDP"
+msgstr ""
+
+msgid "TCP/UDP"
+msgstr ""
+
+msgid "1 hour"
+msgstr ""
+
+msgid "6 hours"
+msgstr ""
+
+msgid "12 hours"
+msgstr ""
+
+msgid "24 hours"
+msgstr ""
+
+msgid "7 days"
+msgstr ""
+
+msgid "hours"
+msgstr ""
+
+msgid "days"
+msgstr ""
