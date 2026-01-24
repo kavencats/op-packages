@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=LuCI Network Audit Application
-LUCI_DEPENDS:=+iptables +kmod-nf-log +rpcd +rpcd-mod-file +tc +conntrack-tools
+LUCI_DEPENDS:=+iptables +kmod-nf-log +rpcd +rpcd-mod-file +tc +conntrack
 LUCI_PKGARCH:=all
 
 PKG_NAME:=luci-app-network-audit
