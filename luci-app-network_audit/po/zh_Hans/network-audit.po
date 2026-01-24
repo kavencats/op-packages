@@ -247,3 +247,30 @@ msgstr "UDP 连接"
 
 msgid "Blocked Count"
 msgstr "阻止计数"
+
+msgid "Version"
+msgstr "版本"
+
+msgid "Uptime"
+msgstr "运行时间"
+
+msgid "View Rules"
+msgstr "查看规则"
+
+msgid "No log file found. Service may not be running."
+msgstr "未找到日志文件。服务可能未运行。"
+
+msgid "Logs cleared successfully"
+msgstr "日志清除成功"
+
+msgid "Cannot write to log file"
+msgstr "无法写入日志文件"
+
+msgid "No active connections found"
+msgstr "未找到活动连接"
+
+msgid "No log content to download"
+msgstr "没有日志内容可下载"
+
+msgid "Rules Count"
+msgstr "规则数量"
