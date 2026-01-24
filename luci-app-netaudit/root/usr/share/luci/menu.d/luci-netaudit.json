@@ -1,0 +1,45 @@
+{
+    "admin/services/netaudit": {
+        "title": "Network Audit",
+        "order": 60,
+        "action": {
+            "type": "firstchild"
+        },
+        "depends": {
+            "acl": ["luci-netaudit"],
+            "fs": ["/usr/lib/netaudit/netaudit.sh"]
+        }
+    },
+    "admin/services/netaudit/overview": {
+        "title": "Overview",
+        "order": 1,
+        "action": {
+            "type": "view",
+            "path": "netaudit/overview"
+        }
+    },
+    "admin/services/netaudit/monitoring": {
+        "title": "Monitoring",
+        "order": 2,
+        "action": {
+            "type": "view",
+            "path": "netaudit/monitoring"
+        }
+    },
+    "admin/services/netaudit/filtering": {
+        "title": "Filtering",
+        "order": 3,
+        "action": {
+            "type": "view",
+            "path": "netaudit/filtering"
+        }
+    },
+    "admin/services/netaudit/settings": {
+        "title": "Settings",
+        "order": 4,
+        "action": {
+            "type": "view",
+            "path": "netaudit/settings"
+        }
+    }
+}

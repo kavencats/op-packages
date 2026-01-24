@@ -1,0 +1,242 @@
+msgid "Network Audit"
+msgstr "Network Audit"
+
+msgid "Network traffic monitoring and auditing tool"
+msgstr "Network traffic monitoring and auditing tool"
+
+msgid "Overview"
+msgstr "Overview"
+
+msgid "Traffic Monitoring"
+msgstr "Traffic Monitoring"
+
+msgid "Domain Filtering"
+msgstr "Domain Filtering"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "Service Status"
+msgstr "Service Status"
+
+msgid "Service Control"
+msgstr "Service Control"
+
+msgid "Restart Service"
+msgstr "Restart Service"
+
+msgid "Real-time Statistics"
+msgstr "Real-time Statistics"
+
+msgid "Total Traffic"
+msgstr "Total Traffic"
+
+msgid "Active Connections"
+msgstr "Active Connections"
+
+msgid "Recent Logs"
+msgstr "Recent Logs"
+
+msgid "No logs available"
+msgstr "No logs available"
+
+msgid "Configure network traffic monitoring settings"
+msgstr "Configure network traffic monitoring settings"
+
+msgid "Monitoring Settings"
+msgstr "Monitoring Settings"
+
+msgid "Enable Monitoring"
+msgstr "Enable Monitoring"
+
+msgid "Enable network traffic monitoring"
+msgstr "Enable network traffic monitoring"
+
+msgid "Update Interval (seconds)"
+msgstr "Update Interval (seconds)"
+
+msgid "Log Level"
+msgstr "Log Level"
+
+msgid "Disabled"
+msgstr "Disabled"
+
+msgid "Minimal"
+msgstr "Minimal"
+
+msgid "Normal"
+msgstr "Normal"
+
+msgid "Verbose"
+msgstr "Verbose"
+
+msgid "Monitor Protocols"
+msgstr "Monitor Protocols"
+
+msgid "Log New Connections"
+msgstr "Log New Connections"
+
+msgid "Log all new network connections"
+msgstr "Log all new network connections"
+
+msgid "Max Connections Log"
+msgstr "Max Connections Log"
+
+msgid "Maximum connections to log (0 for unlimited)"
+msgstr "Maximum connections to log (0 for unlimited)"
+
+msgid "Traffic Thresholds"
+msgstr "Traffic Thresholds"
+
+msgid "Interface"
+msgstr "Interface"
+
+msgid "Threshold Type"
+msgstr "Threshold Type"
+
+msgid "Bandwidth"
+msgstr "Bandwidth"
+
+msgid "Connections"
+msgstr "Connections"
+
+msgid "Threshold Value"
+msgstr "Threshold Value"
+
+msgid "Action"
+msgstr "Action"
+
+msgid "Log Only"
+msgstr "Log Only"
+
+msgid "Send Alert"
+msgstr "Send Alert"
+
+msgid "Limit Bandwidth"
+msgstr "Limit Bandwidth"
+
+msgid "Configure domain and URL filtering rules"
+msgstr "Configure domain and URL filtering rules"
+
+msgid "Filtering Settings"
+msgstr "Filtering Settings"
+
+msgid "Enable Filtering"
+msgstr "Enable Filtering"
+
+msgid "Enable domain and URL filtering"
+msgstr "Enable domain and URL filtering"
+
+msgid "Filtering Mode"
+msgstr "Filtering Mode"
+
+msgid "Blacklist (block listed)"
+msgstr "Blacklist (block listed)"
+
+msgid "Whitelist (allow only listed)"
+msgstr "Whitelist (allow only listed)"
+
+msgid "Domain Rules"
+msgstr "Domain Rules"
+
+msgid "Domain"
+msgstr "Domain"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Block"
+msgstr "Block"
+
+msgid "Redirect"
+msgstr "Redirect"
+
+msgid "Redirect URL"
+msgstr "Redirect URL"
+
+msgid "Category Filtering"
+msgstr "Category Filtering"
+
+msgid "Category"
+msgstr "Category"
+
+msgid "Social Media"
+msgstr "Social Media"
+
+msgid "Gaming"
+msgstr "Gaming"
+
+msgid "Shopping"
+msgstr "Shopping"
+
+msgid "Video Streaming"
+msgstr "Video Streaming"
+
+msgid "P2P File Sharing"
+msgstr "P2P File Sharing"
+
+msgid "Adult Content"
+msgstr "Adult Content"
+
+msgid "Limit Access"
+msgstr "Limit Access"
+
+msgid "Schedule Block"
+msgstr "Schedule Block"
+
+msgid "Schedule"
+msgstr "Schedule"
+
+msgid "Configure general plugin settings"
+msgstr "Configure general plugin settings"
+
+msgid "General Settings"
+msgstr "General Settings"
+
+msgid "Data Retention (days)"
+msgstr "Data Retention (days)"
+
+msgid "Max Log Size (MB)"
+msgstr "Max Log Size (MB)"
+
+msgid "Auto Update Rules"
+msgstr "Auto Update Rules"
+
+msgid "Automatically update filtering rules"
+msgstr "Automatically update filtering rules"
+
+msgid "Update Schedule"
+msgstr "Update Schedule"
+
+msgid "Notifications"
+msgstr "Notifications"
+
+msgid "Enable Email Notifications"
+msgstr "Enable Email Notifications"
+
+msgid "Email Address"
+msgstr "Email Address"
+
+msgid "Enable Webhook"
+msgstr "Enable Webhook"
+
+msgid "Webhook URL"
+msgstr "Webhook URL"
+
+msgid "Advanced Settings"
+msgstr "Advanced Settings"
+
+msgid "Debug Mode"
+msgstr "Debug Mode"
+
+msgid "System Logs"
+msgstr "System Logs"
+
+msgid "Clear All Logs"
+msgstr "Clear All Logs"
+
+msgid "Configuration"
+msgstr "Configuration"
+
+msgid "Backup Configuration"
+msgstr "Backup Configuration"

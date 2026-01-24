@@ -1,0 +1,47 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+STOP=10
+USE_PROCD=1
+NAME=netaudit
+PROG=/usr/lib/netaudit/netaudit.sh
+CONFIG=/etc/config/netaudit
+LOG_FILE="/var/log/netaudit.log"
+
+start_service() {
+    procd_open_instance
+    procd_set_param command "$PROG"
+    procd_set_param stdout 1
+    procd_set_param stderr 1
+    procd_set_param respawn ${respawn_threshold:-3600} ${respawn_timeout:-5} ${respawn_retry:-5}
+    procd_set_param file $CONFIG
+    procd_set_param user root
+    procd_set_param pidfile /var/run/$NAME.pid
+    procd_close_instance
+    
+    echo "$(date): Network Audit service started" >> $LOG_FILE
+}
+
+stop_service() {
+    [ -f /var/run/$NAME.pid ] && {
+        kill $(cat /var/run/$NAME.pid) 2>/dev/null
+        rm -f /var/run/$NAME.pid
+    }
+    
+    echo "$(date): Network Audit service stopped" >> $LOG_FILE
+}
+
+reload_service() {
+    stop
+    sleep 2
+    start
+}
+
+boot() {
+    [ -f $CONFIG ] && {
+        uci -q get netaudit.@global[0].enabled | grep -q 1 && {
+            sleep 10
+            start
+        }
+    }
+}

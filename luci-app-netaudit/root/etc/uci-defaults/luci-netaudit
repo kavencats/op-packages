@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# 检查并创建必要的目录
+mkdir -p /var/log /usr/lib/netaudit
+
+# 设置权限
+chmod 755 /usr/lib/netaudit/netaudit.sh
+chmod 644 /etc/config/netaudit
+chmod 755 /etc/init.d/netaudit
+
+# 如果配置文件不存在，创建默认配置
+[ -f /etc/config/netaudit ] || {
+    uci batch <<EOF
+set netaudit.global='settings'
+set netaudit.global.enabled='0'
+set netaudit.global.data_retention='30'
+set netaudit.global.log_size='10'
+
+set netaudit.monitoring='settings'
+set netaudit.monitoring.enabled='1'
+set netaudit.monitoring.interval='5'
+set netaudit.monitoring.log_level='2'
+set netaudit.monitoring.log_connections='1'
+set netaudit.monitoring.max_connections='1000'
+add_list netaudit.monitoring.protocols='tcp'
+add_list netaudit.monitoring.protocols='udp'
+
+set netaudit.filtering='settings'
+set netaudit.filtering.enabled='0'
+set netaudit.filtering.mode='blacklist'
+
+set netaudit.notification='settings'
+set netaudit.notification.email_enabled='0'
+set netaudit.notification.webhook_enabled='0'
+
+set netaudit.advanced='settings'
+set netaudit.advanced.debug='0'
+
+commit netaudit
+EOF
+}
+
+# 启用服务
+/etc/init.d/netaudit enable
+
+# 创建日志文件
+touch /var/log/netaudit.log
+chmod 644 /var/log/netaudit.log
+
+exit 0

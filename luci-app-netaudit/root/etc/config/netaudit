@@ -1,0 +1,24 @@
+config global 'settings'
+    option enabled '0'
+    option data_retention '30'
+    option log_size '10'
+
+config monitoring 'settings'
+    option enabled '1'
+    option interval '5'
+    option log_level '2'
+    option log_connections '1'
+    option max_connections '1000'
+    list protocols 'tcp'
+    list protocols 'udp'
+
+config filtering 'settings'
+    option enabled '0'
+    option mode 'blacklist'
+
+config notification 'settings'
+    option email_enabled '0'
+    option webhook_enabled '0'
+
+config advanced 'settings'
+    option debug '0'
