@@ -160,3 +160,90 @@ msgstr ""
 
 msgid "Real-time network traffic auditing and monitoring."
 msgstr ""
+
+msgid "Network Audit Logs"
+msgstr ""
+
+msgid "View network audit logs and monitoring information."
+msgstr ""
+
+msgid "Log Viewer"
+msgstr ""
+
+msgid "Log File"
+msgstr ""
+
+msgid "Refresh"
+msgstr ""
+
+msgid "Clear Logs"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "Are you sure you want to clear all logs?"
+msgstr ""
+
+msgid "Recent Connections"
+msgstr ""
+
+msgid "Protocol"
+msgstr ""
+
+msgid "Source"
+msgstr ""
+
+msgid "Destination"
+msgstr ""
+
+msgid "State"
+msgstr ""
+
+msgid "Time"
+msgstr ""
+
+msgid "No connections found"
+msgstr ""
+
+msgid "Network Audit Rules"
+msgstr ""
+
+msgid "View and manage current network audit rules and iptables chains."
+msgstr ""
+
+msgid "Active Rules"
+msgstr ""
+
+msgid "IPTables Chains"
+msgstr ""
+
+msgid "Refresh Rules"
+msgstr ""
+
+msgid "INPUT Chain"
+msgstr ""
+
+msgid "FORWARD Chain"
+msgstr ""
+
+msgid "OUTPUT Chain"
+msgstr ""
+
+msgid "No rules found"
+msgstr ""
+
+msgid "Connection Statistics"
+msgstr ""
+
+msgid "Total Connections"
+msgstr ""
+
+msgid "TCP Connections"
+msgstr ""
+
+msgid "UDP Connections"
+msgstr ""
+
+msgid "Blocked Count"
+msgstr ""
