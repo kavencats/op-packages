@@ -5,7 +5,8 @@
 USE_PROCD=1
 START=99
 STOP=10
-EXTRA_COMMANDS="status"
+EXTRA_COMMANDS="cleanup"
+EXTRA_HELP="  cleanup  Clean up iptables rules and temporary files"
 
 SERVICE_NAME="network-audit"
 SERVICE_DAEMON="/usr/share/network-audit/scripts/audit.sh"
@@ -24,6 +25,23 @@ validate_config() {
 service_triggers() {
     procd_add_reload_trigger "network-audit"
     procd_add_validation validate_config
+}
+
+cleanup_iptables() {
+    # 清理 iptables 规则
+    iptables -D INPUT -j NETWORK_AUDIT_INPUT 2>/dev/null
+    iptables -D FORWARD -j NETWORK_AUDIT_FORWARD 2>/dev/null
+    iptables -D OUTPUT -j NETWORK_AUDIT_OUTPUT 2>/dev/null
+    
+    iptables -F NETWORK_AUDIT_INPUT 2>/dev/null
+    iptables -F NETWORK_AUDIT_FORWARD 2>/dev/null
+    iptables -F NETWORK_AUDIT_OUTPUT 2>/dev/null
+    
+    iptables -X NETWORK_AUDIT_INPUT 2>/dev/null
+    iptables -X NETWORK_AUDIT_FORWARD 2>/dev/null
+    iptables -X NETWORK_AUDIT_OUTPUT 2>/dev/null
+    
+    logger -t network-audit "IPTables rules cleaned up"
 }
 
 start_service() {
@@ -50,10 +68,41 @@ start_service() {
 
 stop_service() {
     if [ -f "$SERVICE_PID_FILE" ]; then
-        kill -TERM $(cat "$SERVICE_PID_FILE") 2>/dev/null
+        local pid=$(cat "$SERVICE_PID_FILE")
+        if kill -0 "$pid" 2>/dev/null; then
+            kill -TERM "$pid" 2>/dev/null
+            sleep 2
+            if kill -0 "$pid" 2>/dev/null; then
+                kill -KILL "$pid" 2>/dev/null
+            fi
+        fi
         rm -f "$SERVICE_PID_FILE"
     fi
     logger -t network-audit "Service stopped"
+    return 0
+}
+
+cleanup() {
+    echo "Cleaning up network-audit service..."
+    
+    # 停止服务
+    stop_service
+    
+    # 清理 iptables
+    cleanup_iptables
+    
+    # 清理运行时文件
+    rm -f /var/run/network-audit.pid
+    rm -rf /var/run/network-audit
+    
+    # 清理日志文件
+    echo "Clearing log file..."
+    > /var/log/network-audit.log 2>/dev/null
+    
+    # 禁用服务
+    rm -f /etc/rc.d/*network-audit 2>/dev/null
+    
+    echo "Cleanup completed"
     return 0
 }
 
