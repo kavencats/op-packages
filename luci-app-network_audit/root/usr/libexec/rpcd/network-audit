@@ -1,0 +1,68 @@
+#!/usr/bin/lua
+-- RPCD plugin for network-audit
+
+local uci = require "luci.model.uci".cursor()
+local json = require "luci.jsonc"
+local sys = require "luci.sys"
+
+local function get_status()
+    local running = sys.call("pidof network-audit >/dev/null") == 0
+    local enabled = uci:get("network-audit", "general", "enabled") or "0"
+    
+    return {
+        running = running,
+        enabled = enabled == "1",
+        version = "1.0.0"
+    }
+end
+
+local function execute_command(cmd)
+    local handle = io.popen(cmd .. " 2>&1")
+    local result = handle:read("*a")
+    handle:close()
+    return result
+end
+
+local methods = {
+    get_status = {
+        call = function()
+            return { get_status() }
+        end
+    },
+    
+    get_logs = {
+        call = function()
+            local logs = execute_command("tail -100 /var/log/network-audit.log 2>/dev/null || echo 'No logs'")
+            return { logs = logs }
+        end
+    },
+    
+    clear_logs = {
+        call = function()
+            os.execute("echo '' > /var/log/network-audit.log")
+            return { success = true }
+        end
+    },
+    
+    get_connections = {
+        call = function()
+            local connections = execute_command("conntrack -L -n 2>/dev/null | wc -l")
+            return { count = tonumber(connections) or 0 }
+        end
+    },
+    
+    get_iptables_stats = {
+        call = function()
+            local stats = execute_command("iptables -L NETWORK_AUDIT_INPUT -vnx 2>/dev/null || echo 'No rules'")
+            return { stats = stats }
+        end
+    }
+}
+
+function dispatch(method, params)
+    local fn = methods[method]
+    if fn then
+        return fn.call(params)
+    end
+    return nil
+end

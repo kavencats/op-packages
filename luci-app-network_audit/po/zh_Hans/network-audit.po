@@ -1,0 +1,162 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Network Audit"
+msgstr "网络审计"
+
+msgid "Configure network traffic auditing and monitoring"
+msgstr "配置网络流量审计和监控"
+
+msgid "Overview"
+msgstr "概览"
+
+msgid "Settings"
+msgstr "设置"
+
+msgid "Logs"
+msgstr "日志"
+
+msgid "Rules"
+msgstr "规则"
+
+msgid "Network Audit Settings"
+msgstr "网络审计设置"
+
+msgid "General Settings"
+msgstr "通用设置"
+
+msgid "Enable Network Audit"
+msgstr "启用网络审计"
+
+msgid "Enable or disable network traffic auditing"
+msgstr "启用或禁用网络流量审计"
+
+msgid "Log Level"
+msgstr "日志级别"
+
+msgid "Debug"
+msgstr "调试"
+
+msgid "Info"
+msgstr "信息"
+
+msgid "Warning"
+msgstr "警告"
+
+msgid "Error"
+msgstr "错误"
+
+msgid "Max Log Size (MB)"
+msgstr "最大日志大小(MB)"
+
+msgid "Maximum log file size in megabytes"
+msgstr "最大日志文件大小（以MB为单位）"
+
+msgid "Audit Interfaces"
+msgstr "审计接口"
+
+msgid "Network interfaces to monitor (leave empty for all)"
+msgstr "要监控的网络接口（留空为全部）"
+
+msgid "Audit Protocols"
+msgstr "审计协议"
+
+msgid "Port Monitoring"
+msgstr "端口监控"
+
+msgid "Monitor specific ports for suspicious activity"
+msgstr "监控特定端口的可疑活动"
+
+msgid "Suspicious Ports"
+msgstr "可疑端口"
+
+msgid "Ports to monitor for suspicious activity"
+msgstr "要监控可疑活动的端口"
+
+msgid "Enable Rate Limiting"
+msgstr "启用速率限制"
+
+msgid "Enable connection rate limiting"
+msgstr "启用连接速率限制"
+
+msgid "Max Connections per Second"
+msgstr "每秒最大连接数"
+
+msgid "Maximum allowed connections per second"
+msgstr "每秒允许的最大连接数"
+
+msgid "Alert Email"
+msgstr "告警邮箱"
+
+msgid "Email address for alerts (leave empty to disable)"
+msgstr "告警邮箱地址（留空则禁用）"
+
+msgid "Audit Rules"
+msgstr "审计规则"
+
+msgid "Block Countries"
+msgstr "阻止国家"
+
+msgid "Country codes to block (e.g., CN, RU, IR)"
+msgstr "要阻止的国家代码（例如：CN, RU, IR）"
+
+msgid "Whitelist IPs"
+msgstr "白名单IP"
+
+msgid "IP addresses to exclude from auditing"
+msgstr "从审计中排除的IP地址"
+
+msgid "Blacklist IPs"
+msgstr "黑名单IP"
+
+msgid "IP addresses to always block"
+msgstr "始终阻止的IP地址"
+
+msgid "Service Status"
+msgstr "服务状态"
+
+msgid "Enabled"
+msgstr "已启用"
+
+msgid "Start"
+msgstr "启动"
+
+msgid "Stop"
+msgstr "停止"
+
+msgid "Restart"
+msgstr "重启"
+
+msgid "System Information"
+msgstr "系统信息"
+
+msgid "Active Connections"
+msgstr "活动连接"
+
+msgid "Blocked IPs"
+msgstr "阻止的IP"
+
+msgid "Log File Size"
+msgstr "日志文件大小"
+
+msgid "Go to Settings"
+msgstr "前往设置"
+
+msgid "View Logs"
+msgstr "查看日志"
+
+msgid "Running"
+msgstr "运行中"
+
+msgid "Stopped"
+msgstr "已停止"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "No"
+msgstr "否"
+
+msgid "Real-time network traffic auditing and monitoring."
+msgstr "实时网络流量审计和监控。"

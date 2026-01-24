@@ -1,0 +1,162 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Network Audit"
+msgstr ""
+
+msgid "Configure network traffic auditing and monitoring"
+msgstr ""
+
+msgid "Overview"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Logs"
+msgstr ""
+
+msgid "Rules"
+msgstr ""
+
+msgid "Network Audit Settings"
+msgstr ""
+
+msgid "General Settings"
+msgstr ""
+
+msgid "Enable Network Audit"
+msgstr ""
+
+msgid "Enable or disable network traffic auditing"
+msgstr ""
+
+msgid "Log Level"
+msgstr ""
+
+msgid "Debug"
+msgstr ""
+
+msgid "Info"
+msgstr ""
+
+msgid "Warning"
+msgstr ""
+
+msgid "Error"
+msgstr ""
+
+msgid "Max Log Size (MB)"
+msgstr ""
+
+msgid "Maximum log file size in megabytes"
+msgstr ""
+
+msgid "Audit Interfaces"
+msgstr ""
+
+msgid "Network interfaces to monitor (leave empty for all)"
+msgstr ""
+
+msgid "Audit Protocols"
+msgstr ""
+
+msgid "Port Monitoring"
+msgstr ""
+
+msgid "Monitor specific ports for suspicious activity"
+msgstr ""
+
+msgid "Suspicious Ports"
+msgstr ""
+
+msgid "Ports to monitor for suspicious activity"
+msgstr ""
+
+msgid "Enable Rate Limiting"
+msgstr ""
+
+msgid "Enable connection rate limiting"
+msgstr ""
+
+msgid "Max Connections per Second"
+msgstr ""
+
+msgid "Maximum allowed connections per second"
+msgstr ""
+
+msgid "Alert Email"
+msgstr ""
+
+msgid "Email address for alerts (leave empty to disable)"
+msgstr ""
+
+msgid "Audit Rules"
+msgstr ""
+
+msgid "Block Countries"
+msgstr ""
+
+msgid "Country codes to block (e.g., CN, RU, IR)"
+msgstr ""
+
+msgid "Whitelist IPs"
+msgstr ""
+
+msgid "IP addresses to exclude from auditing"
+msgstr ""
+
+msgid "Blacklist IPs"
+msgstr ""
+
+msgid "IP addresses to always block"
+msgstr ""
+
+msgid "Service Status"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
+msgid "Stop"
+msgstr ""
+
+msgid "Restart"
+msgstr ""
+
+msgid "System Information"
+msgstr ""
+
+msgid "Active Connections"
+msgstr ""
+
+msgid "Blocked IPs"
+msgstr ""
+
+msgid "Log File Size"
+msgstr ""
+
+msgid "Go to Settings"
+msgstr ""
+
+msgid "View Logs"
+msgstr ""
+
+msgid "Running"
+msgstr ""
+
+msgid "Stopped"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "Real-time network traffic auditing and monitoring."
+msgstr ""

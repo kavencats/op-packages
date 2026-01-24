@@ -1,0 +1,20 @@
+{
+    "luci-app-network-audit": {
+        "description": "Grant access to Network Audit functions",
+        "read": {
+            "ubus": {
+                "luci": ["*"],
+                "file": ["exec", "list"],
+                "service": ["*"]
+            }
+        },
+        "write": {
+            "ubus": {
+                "luci": ["*"],
+                "file": ["exec", "write"],
+                "service": ["*"]
+            },
+            "uci": ["network-audit"]
+        }
+    }
+}

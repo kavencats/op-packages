@@ -1,0 +1,136 @@
+<%+header%>
+
+<div class="cbi-map" id="cbi-network-audit">
+    <h2 name="content"><%:Network Audit Overview%></h2>
+    
+    <div class="cbi-map-descr">
+        <p><%:Real-time network traffic auditing and monitoring.%></p>
+    </div>
+    
+    <fieldset class="cbi-section">
+        <legend><%:Service Status%></legend>
+        <div class="cbi-value">
+            <label class="cbi-value-title"><%:Service Status%>:</label>
+            <div class="cbi-value-field">
+                <span id="service-status" class="status-label">-</span>
+            </div>
+        </div>
+        <div class="cbi-value">
+            <label class="cbi-value-title"><%:Enabled%>:</label>
+            <div class="cbi-value-field">
+                <span id="service-enabled">-</span>
+            </div>
+        </div>
+    </fieldset>
+    
+    <fieldset class="cbi-section">
+        <legend><%:Quick Actions%></legend>
+        <div class="cbi-page-actions right">
+            <button class="cbi-button cbi-button-apply" id="btn-start"><%:Start%></button>
+            <button class="cbi-button cbi-button-reset" id="btn-stop"><%:Stop%></button>
+            <button class="cbi-button cbi-button-save" id="btn-restart"><%:Restart%></button>
+        </div>
+    </fieldset>
+    
+    <fieldset class="cbi-section">
+        <legend><%:System Information%></legend>
+        <div class="cbi-value">
+            <label class="cbi-value-title"><%:Active Connections%>:</label>
+            <div class="cbi-value-field">
+                <span id="active-connections">-</span>
+            </div>
+        </div>
+        <div class="cbi-value">
+            <label class="cbi-value-title"><%:Blocked IPs%>:</label>
+            <div class="cbi-value-field">
+                <span id="blocked-ips">-</span>
+            </div>
+        </div>
+        <div class="cbi-value">
+            <label class="cbi-value-title"><%:Log File Size%>:</label>
+            <div class="cbi-value-field">
+                <span id="log-size">-</span>
+            </div>
+        </div>
+    </fieldset>
+    
+    <div class="cbi-page-actions">
+        <a class="cbi-button cbi-button-action" href="<%=url("admin/services/network-audit/settings")%>"><%:Go to Settings%></a>
+        <a class="cbi-button" href="<%=url("admin/services/network-audit/logs")%>"><%:View Logs%></a>
+    </div>
+</div>
+
+<script type="text/javascript">
+    //<![CDATA[
+    function updateStatus() {
+        XHR.get('<%=url("admin/services/network-audit/status")%>', null,
+            function(x, data) {
+                if (data) {
+                    var status = JSON.parse(data);
+                    var statusLabel = document.getElementById('service-status');
+                    var enabledSpan = document.getElementById('service-enabled');
+                    
+                    if (status.running) {
+                        statusLabel.innerHTML = '<span style="color: green"><%:Running%></span>';
+                    } else {
+                        statusLabel.innerHTML = '<span style="color: red"><%:Stopped%></span>';
+                    }
+                    
+                    enabledSpan.innerHTML = status.enabled ? '<%:Yes%>' : '<%:No%>';
+                }
+            }
+        );
+        
+        // Update system info
+        XHR.get('/cgi-bin/luci/admin/ubus', {
+            json: JSON.stringify({
+                jsonrpc: '2.0',
+                id: 1,
+                method: 'call',
+                params: [
+                    '00000000000000000000000000000000',
+                    'file',
+                    'exec',
+                    {
+                        command: 'conntrack',
+                        params: ['-L', '-n']
+                    }
+                ]
+            })
+        }, function(x, data) {
+            if (data) {
+                var resp = JSON.parse(data);
+                if (resp.result && resp.result[1]) {
+                    var lines = resp.result[1].stdout.split('\n').filter(Boolean);
+                    document.getElementById('active-connections').innerHTML = lines.length;
+                }
+            }
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        updateStatus();
+        setInterval(updateStatus, 5000);
+        
+        document.getElementById('btn-start').addEventListener('click', function() {
+            XHR.get('<%=url("admin/services/network-audit/start")%>', null, function() {
+                setTimeout(updateStatus, 1000);
+            });
+        });
+        
+        document.getElementById('btn-stop').addEventListener('click', function() {
+            XHR.get('<%=url("admin/services/network-audit/stop")%>', null, function() {
+                setTimeout(updateStatus, 1000);
+            });
+        });
+        
+        document.getElementById('btn-restart').addEventListener('click', function() {
+            XHR.get('<%=url("admin/services/network-audit/restart")%>', null, function() {
+                setTimeout(updateStatus, 1000);
+            });
+        });
+    });
+    //]]>
+</script>
+
+<%+footer%>
