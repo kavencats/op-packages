@@ -211,13 +211,22 @@ monitor_connections() {
 cleanup() {
     log_message "INFO" "Shutting down network audit service"
     
+    # 标记退出信号
+    touch "$STATE_DIR/shutdown"
+    
+    # 等待子进程结束
+    sleep 1
+    
     # 清理 iptables 规则
     cleanup_iptables
     
     # 清理 PID 文件
     rm -f "$PID_FILE"
     
-    log_message "INFO" "Network audit service stopped"
+    # 清理状态目录
+    rm -rf "$STATE_DIR"
+    
+    log_message "INFO" "Network audit service stopped gracefully"
     exit 0
 }
 
@@ -249,3 +258,4 @@ main() {
 
 # 运行主函数
 main "$@"
+
