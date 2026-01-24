@@ -39,14 +39,39 @@ function index()
 end
 
 function action_status()
-    local uci = require "luci.model.uci".cursor()
     local sys = require "luci.sys"
+    local fs = require "nixio.fs"
+    local uci = require "luci.model.uci"
+    local cursor = uci.cursor()
     
     local status = {
-        running = (sys.call("pidof network-audit >/dev/null") == 0),
-        enabled = (uci:get("network-audit", "general", "enabled") or "0") == "1",
-        version = "1.0.0"
+        running = false,
+        enabled = false,
+        version = "1.0.0",
+        uptime = "0s"
     }
+    
+    -- Check if service is running
+    local pid = sys.exec("pgrep -f 'network-audit' 2>/dev/null | head -1")
+    if pid and pid:match("%d+") then
+        status.running = true
+        
+        -- Get uptime
+        local uptime_cmd = string.format("ps -o etime= -p %s 2>/dev/null", pid:match("%d+"))
+        local uptime = sys.exec(uptime_cmd)
+        if uptime and uptime:match("%S+") then
+            status.uptime = uptime:gsub("%s+", "")
+        end
+    end
+    
+    -- Check if enabled in config
+    cursor:foreach("network-audit", "network-audit", 
+        function(section)
+            if section[".type"] == "general" then
+                status.enabled = (section.enabled or "0") == "1"
+            end
+        end
+    )
     
     luci.http.prepare_content("application/json")
     luci.http.write_json(status)
@@ -101,4 +126,5 @@ function action_clear_logs()
     sys.call("echo '' > /var/log/network-audit.log 2>/dev/null")
     luci.http.prepare_content("application/json")
     luci.http.write_json({success = true})
+
 end
