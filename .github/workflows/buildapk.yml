@@ -37,7 +37,10 @@ jobs:
       # 生成时间戳
       - name: Generate timestamp
         id: timestamp
-        run: echo "time=$(TZ='Asia/Shanghai' date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+        run: |
+          echo "time=$(TZ='Asia/Shanghai' date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+          chmod 755 -R luci-app-netaudit
+        
 
       - name: Building packages for ${{ matrix.pakgs }}
         uses: sbwml/openwrt-gh-action-sdk@main
