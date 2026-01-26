@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Audit Function Plugin for OpenWrt
 LUCI_DESCRIPTION:=A comprehensive audit system for monitoring and logging system events with nftables support
-LUCI_DEPENDS:=+luci-base +lua +nftables-json +logd +ubus-utils
+LUCI_DEPENDS:=+luci-base +lua +nftables-json +logd +ubus
 LUCI_PKGARCH:=all
 LUCI_LANG:=zh-cn en
 
@@ -26,5 +26,6 @@ define Package/luci-app-audit/postinst
 }
 exit 0
 endef
+
 
 # call BuildPackage - OpenWrt buildroot signature
