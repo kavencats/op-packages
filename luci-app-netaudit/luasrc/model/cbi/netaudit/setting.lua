@@ -1,64 +1,51 @@
-m = Map("netaudit", translate("Plugin Settings"),
-    translate("Configure general plugin settings"))
+m = Map("netaudit", translate("Advanced Settings"))
 
-s = m:section(TypedSection, "settings", translate("General Settings"))
+s = m:section(TypedSection, "settings", translate("Log Settings"))
 s.anonymous = true
 s.addremove = false
 
-data_retention = s:option(Value, "retention", translate("Data Retention (days)"))
-data_retention.datatype = "range(1,365)"
-data_retention.default = "30"
+rotation = s:option(ListValue, "log_rotation", translate("Log Rotation"))
+rotation:value("hourly", "Hourly")
+rotation:value("daily", "Daily")
+rotation:value("weekly", "Weekly")
+rotation.default = "daily"
 
-log_size = s:option(Value, "log_size", translate("Max Log Size (MB)"))
-log_size.datatype = "range(1,1024)"
-log_size.default = "10"
+max_size = s:option(Value, "max_log_size", translate("Max Log Size (MB)"))
+max_size.datatype = "uinteger"
+max_size.default = "10"
 
-auto_update = s:option(Flag, "auto_update", translate("Auto Update Rules"),
-    translate("Automatically update filtering rules"))
-auto_update.default = "0"
+store_days = s:option(Value, "store_days", translate("Store Days"))
+store_days.datatype = "uinteger"
+store_days.default = "30"
 
-update_schedule = s:option(Value, "update_schedule", translate("Update Schedule"))
-update_schedule:depends({auto_update = "1"})
-update_schedule.placeholder = "0 2 * * *"
-update_schedule.default = "0 2 * * *"
-
-s = m:section(TypedSection, "notification", translate("Notifications"))
+s = m:section(TypedSection, "monitor", translate("Network Interfaces"))
 s.anonymous = true
+s.addremove = false
 
-email_notify = s:option(Flag, "email_enabled", translate("Enable Email Notifications"))
-email_notify.default = "0"
+track_local = s:option(Flag, "track_local", translate("Track Local Traffic"))
+track_local.default = "1"
+track_local.rmempty = false
 
-email_address = s:option(Value, "email", translate("Email Address"))
-email_address:depends({email_enabled = "1"})
-email_address.datatype = "email"
+track_wan = s:option(Flag, "track_wan", translate("Track WAN Traffic"))
+track_wan.default = "1"
+track_wan.rmempty = false
 
-webhook_enable = s:option(Flag, "webhook_enabled", translate("Enable Webhook"))
-webhook_enable.default = "0"
+track_lan = s:option(Flag, "track_lan", translate("Track LAN Traffic"))
+track_lan.default = "1"
+track_lan.rmempty = false
 
-webhook_url = s:option(Value, "webhook_url", translate("Webhook URL"))
-webhook_url:depends({webhook_enabled = "1"})
-webhook_url.datatype = "url"
-
-s = m:section(TypedSection, "advanced", translate("Advanced Settings"))
+s = m:section(TypedSection, "alerts", translate("Notifications"))
 s.anonymous = true
+s.addremove = false
 
-debug_mode = s:option(Flag, "debug", translate("Debug Mode"))
-debug_mode.default = "0"
+syslog_alerts = s:option(Flag, "syslog_alerts", translate("Syslog Alerts"))
+syslog_alerts.default = "1"
 
-flush_logs = s:option(Button, "_flush", translate("System Logs"))
-flush_logs.inputtitle = translate("Clear All Logs")
-flush_logs.inputstyle = "remove"
-function flush_logs.write()
-    os.execute("> /var/log/netaudit.log")
-    luci.http.redirect(luci.dispatcher.build_url("admin/services/netaudit/settings"))
-end
+email_alerts = s:option(Flag, "email_alerts", translate("Email Alerts"))
+email_alerts.default = "0"
 
-backup_config = s:option(Button, "_backup", translate("Configuration"))
-backup_config.inputtitle = translate("Backup Configuration")
-backup_config.inputstyle = "apply"
-function backup_config.write()
-    os.execute("uci export netaudit > /tmp/netaudit_backup.uci")
-    luci.http.redirect(luci.dispatcher.build_url("admin/services/netaudit/settings"))
-end
+alert_interval = s:option(Value, "alert_interval", translate("Alert Interval (seconds)"))
+alert_interval.datatype = "uinteger"
+alert_interval.default = "300"
 
 return m
