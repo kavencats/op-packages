@@ -1,0 +1,80 @@
+<%+header%>
+<div class="cbi-map">
+    <h2 name="content"><%:Audit Log Viewer%></h2>
+    
+    <div class="cbi-section">
+        <div class="cbi-value">
+            <label class="cbi-value-title"><%:Log Lines%></label>
+            <div class="cbi-value-field">
+                <select id="log-lines" onchange="refreshLogView()">
+                    <option value="50">50</option>
+                    <option value="100" selected>100</option>
+                    <option value="200">200</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="cbi-value">
+            <label class="cbi-value-title"><%:Filter%></label>
+            <div class="cbi-value-field">
+                <input type="text" id="log-filter" placeholder="<%:Enter filter term...%>" onkeyup="refreshLogView()"/>
+            </div>
+        </div>
+    </div>
+    
+    <div class="cbi-section">
+        <pre id="log-content" style="height: 500px; overflow: auto; border: 1px solid #ccc; padding: 10px; background: #f9f9f9; font-family: monospace;"></pre>
+        
+        <div class="cbi-page-actions">
+            <button class="cbi-button cbi-button-reload" onclick="refreshLogView()"><%:Refresh%></button>
+            <button class="cbi-button cbi-button-download" onclick="downloadLogs()"><%:Download Logs%></button>
+            <button class="cbi-button cbi-button-reset" onclick="clearLogs()"><%:Clear Logs%></button>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+function refreshLogView() {
+    var lines = document.getElementById('log-lines').value;
+    var filter = document.getElementById('log-filter').value;
+    
+    XHR.get('<%=luci.dispatcher.build_url("admin/services/audit/get_logs")%>', { lines: lines }, function(xhr) {
+        var content = xhr.responseText;
+        
+        if (filter) {
+            var filteredLines = content.split('\n').filter(function(line) {
+                return line.toLowerCase().includes(filter.toLowerCase());
+            });
+            content = filteredLines.join('\n');
+        }
+        
+        document.getElementById('log-content').textContent = content;
+        document.getElementById('log-content').scrollTop = document.getElementById('log-content').scrollHeight;
+    });
+}
+
+function downloadLogs() {
+    window.open('<%=luci.dispatcher.build_url("admin/services/audit/get_logs")%>?lines=0', '_blank');
+}
+
+function clearLogs() {
+    if (confirm('<%:Are you sure you want to clear all audit logs?%>')) {
+        XHR.post('<%=luci.dispatcher.build_url("admin/services/audit/clear_logs")%>', null, function(xhr) {
+            var result = JSON.parse(xhr.responseText);
+            alert(result.message);
+            if (result.success) {
+                refreshLogView();
+            }
+        });
+    }
+}
+
+// Initial load
+refreshLogView();
+
+// Auto-refresh every 60 seconds
+setInterval(refreshLogView, 60000);
+</script>
+<%+footer%>

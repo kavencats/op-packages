@@ -1,0 +1,86 @@
+<%+header%>
+<div class="cbi-map">
+    <h2 name="content"><%:Audit System Dashboard%></h2>
+    
+    <div class="cbi-section">
+        <div class="cbi-value">
+            <label class="cbi-value-title"><%:System Status%></label>
+            <div class="cbi-value-field">
+                <span id="status-indicator">-</span>
+            </div>
+        </div>
+        
+        <div class="cbi-value">
+            <label class="cbi-value-title"><%:nftables Status%></label>
+            <div class="cbi-value-field">
+                <span id="nftables-status">-</span>
+            </div>
+        </div>
+        
+        <div class="cbi-value">
+            <label class="cbi-value-title"><%:Log Size%></label>
+            <div class="cbi-value-field">
+                <span id="log-size">-</span>
+            </div>
+        </div>
+        
+        <div class="cbi-value">
+            <label class="cbi-value-title"><%:Last Event%></label>
+            <div class="cbi-value-field">
+                <span id="last-event">-</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="cbi-section">
+        <h3><%:Recent Events%></h3>
+        <pre id="recent-logs" style="height: 300px; overflow: auto; border: 1px solid #ccc; padding: 10px; background: #f9f9f9;"></pre>
+        <div class="cbi-page-actions">
+            <button class="cbi-button cbi-button-reload" onclick="refreshLogs()"><%:Refresh%></button>
+            <button class="cbi-button cbi-button-reset" onclick="clearLogs()"><%:Clear Logs%></button>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+function updateStatus() {
+    XHR.get('<%=luci.dispatcher.build_url("admin/services/audit/status")%>', null, function(xhr) {
+        var status = JSON.parse(xhr.responseText);
+        document.getElementById('status-indicator').textContent = status.running ? 'Running' : 'Stopped';
+        document.getElementById('status-indicator').className = status.running ? 'cbi-value-green' : 'cbi-value-red';
+        
+        document.getElementById('nftables-status').textContent = status.nftables ? 'Active' : 'Inactive';
+        document.getElementById('nftables-status').className = status.nftables ? 'cbi-value-green' : 'cbi-value-red';
+        
+        document.getElementById('log-size').textContent = (status.log_size / 1024).toFixed(2) + ' KB';
+        document.getElementById('last-event').textContent = status.last_event;
+    });
+}
+
+function refreshLogs() {
+    XHR.get('<%=luci.dispatcher.build_url("admin/services/audit/get_logs")%>', { lines: 50 }, function(xhr) {
+        document.getElementById('recent-logs').textContent = xhr.responseText;
+    });
+}
+
+function clearLogs() {
+    if (confirm('<%:Are you sure you want to clear all audit logs?%>')) {
+        XHR.post('<%=luci.dispatcher.build_url("admin/services/audit/clear_logs")%>', null, function(xhr) {
+            var result = JSON.parse(xhr.responseText);
+            alert(result.message);
+            if (result.success) {
+                refreshLogs();
+            }
+        });
+    }
+}
+
+// Initial load
+updateStatus();
+refreshLogs();
+
+// Auto-refresh every 30 seconds
+setInterval(updateStatus, 30000);
+setInterval(refreshLogs, 30000);
+</script>
+<%+footer%>

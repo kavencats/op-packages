@@ -1,0 +1,19 @@
+{
+    "luci-app-audit": {
+        "description": "Grant access to audit system functions",
+        "read": {
+            "ubus": {
+                "audit": ["get_status", "get_logs"],
+                "system": ["info", "board"],
+                "nftables": ["list_rules"]
+            },
+            "uci": ["audit"]
+        },
+        "write": {
+            "ubus": {
+                "audit": ["clear_logs", "update_rules"]
+            },
+            "uci": ["audit"]
+        }
+    }
+}

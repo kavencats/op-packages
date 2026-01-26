@@ -1,0 +1,31 @@
+#!/usr/sbin/nft -f
+
+# Audit-specific nftables rules - compliant with nftables, disables iptables
+table inet audit {
+    chain input {
+        type filter hook input priority 10; policy accept;
+        
+        # Log dropped packets for audit
+        meta l4proto { tcp, udp } counter log prefix "audit-drop: " group 1 drop
+        
+        # Log connection attempts on sensitive ports
+        tcp dport { 22, 23, 80, 443 } counter log prefix "audit-conn: " accept
+        
+        # Monitor port scanning attempts
+        tcp flags syn counter log prefix "audit-syn: " accept
+    }
+    
+    chain forward {
+        type filter hook forward priority 10; policy accept;
+        
+        # Log forwarded packets
+        ip daddr != 192.168.3.0/24 counter log prefix "audit-fwd: " accept
+    }
+    
+    chain output {
+        type filter hook output priority 10; policy accept;
+        
+        # Log outgoing connections
+        tcp sport >= 1024 counter log prefix "audit-out: " accept
+    }
+}

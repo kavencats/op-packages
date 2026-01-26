@@ -1,0 +1,125 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: luci-app-audit\n"
+"Language: zh_CN\n"
+
+msgid "Audit System"
+msgstr "审计系统"
+
+msgid "Audit System Settings"
+msgstr "审计系统设置"
+
+msgid "Configure global audit system parameters and monitoring options"
+msgstr "配置全局审计系统参数和监控选项"
+
+msgid "Enable Audit System"
+msgstr "启用审计系统"
+
+msgid "Log Level"
+msgstr "日志级别"
+
+msgid "Log File Path"
+msgstr "日志文件路径"
+
+msgid "Maximum Log Size (bytes)"
+msgstr "最大日志大小（字节）"
+
+msgid "Log Retention (days)"
+msgstr "日志保留天数"
+
+msgid "Monitoring Targets"
+msgstr "监控目标"
+
+msgid "Monitor System Events"
+msgstr "监控系统事件"
+
+msgid "Monitor package installations, service changes, and configuration modifications"
+msgstr "监控软件包安装、服务变更和配置修改"
+
+msgid "Monitor Network Events"
+msgstr "监控网络事件"
+
+msgid "Monitor firewall changes, port scans, and connection attempts"
+msgstr "监控防火墙变更、端口扫描和连接尝试"
+
+msgid "Monitor Authentication Events"
+msgstr "监控认证事件"
+
+msgid "Monitor login attempts, privilege changes, and user activities"
+msgstr "监控登录尝试、权限变更和用户活动"
+
+msgid "Audit Rules"
+msgstr "审计规则"
+
+msgid "Configure specific audit rules and event monitoring criteria"
+msgstr "配置具体的审计规则和事件监控标准"
+
+msgid "Rule Name"
+msgstr "规则名称"
+
+msgid "Action"
+msgstr "动作"
+
+msgid "Target"
+msgstr "目标"
+
+msgid "Events to Monitor"
+msgstr "监控事件"
+
+msgid "Severity Level"
+msgstr "严重级别"
+
+msgid "Audit System Dashboard"
+msgstr "审计系统仪表板"
+
+msgid "System Status"
+msgstr "系统状态"
+
+msgid "nftables Status"
+msgstr "nftables状态"
+
+msgid "Log Size"
+msgstr "日志大小"
+
+msgid "Last Event"
+msgstr "最后事件"
+
+msgid "Recent Events"
+msgstr "最近事件"
+
+msgid "Refresh"
+msgstr "刷新"
+
+msgid "Clear Logs"
+msgstr "清除日志"
+
+msgid "Are you sure you want to clear all audit logs?"
+msgstr "确定要清除所有审计日志吗？"
+
+msgid "Audit Log Viewer"
+msgstr "审计日志查看器"
+
+msgid "Log Lines"
+msgstr "日志行数"
+
+msgid "Filter"
+msgstr "过滤器"
+
+msgid "Enter filter term..."
+msgstr "输入过滤条件..."
+
+msgid "Download Logs"
+msgstr "下载日志"
+
+msgid "Dashboard"
+msgstr "仪表板"
+
+msgid "Settings"
+msgstr "设置"
+
+msgid "Rules"
+msgstr "规则"
+
+msgid "Logs"
+msgstr "日志"
