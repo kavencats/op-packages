@@ -1,24 +1,31 @@
+# 网络审计配置
+# 全局设置
 config global 'settings'
-    option enabled '0'
-    option data_retention '30'
-    option log_size '10'
+	option enabled '0'
+	option log_level 'info'
+	option log_rotation 'daily'
+	option max_log_size '10'
+	option store_days '30'
 
-config monitoring 'settings'
-    option enabled '1'
-    option interval '5'
-    option log_level '2'
-    option log_connections '1'
-    option max_connections '1000'
-    list protocols 'tcp'
-    list protocols 'udp'
+# 流量监控设置
+config traffic 'monitor'
+	option sampling_rate '100'
+	option capture_protocols 'tcp udp icmp'
+	option track_local '1'
+	option track_wan '1'
+	option track_lan '1'
 
-config filtering 'settings'
-    option enabled '0'
-    option mode 'blacklist'
+# 过滤规则设置
+config filter 'rules'
+	option block_suspicious '0'
+	option scan_threshold '100'
+	list alert_ports '22'
+	list alert_ports '23'
+	list alert_ports '3389'
 
-config notification 'settings'
-    option email_enabled '0'
-    option webhook_enabled '0'
-
-config advanced 'settings'
-    option debug '0'
+# 通知设置
+config notification 'alerts'
+	option email_alerts '0'
+	option syslog_alerts '1'
+	option webhook_alerts '0'
+	option alert_interval '300'
