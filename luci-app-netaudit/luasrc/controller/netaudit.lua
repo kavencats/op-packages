@@ -19,19 +19,18 @@ function index()
 end
 
 function action_status()
-    local http = require "luci.http"
-    local sys = require "luci.sys"
+    local uci = require("luci.model.uci").cursor()
+    local sys = require("luci.sys")
     
-    local status = {
-        service = sys.init.enabled("netaudit") and "running" or "stopped",
-        uptime = sys.exec("ps | grep netaudit.sh | grep -v grep | awk '{print $5}'"),
-        connections = sys.exec("netstat -tn 2>/dev/null | wc -l"),
-        memory = sys.exec("free -m | awk 'NR==2{printf \"%sMB\", $3}'"),
-        timestamp = os.date("%Y-%m-%d %H:%M:%S")
-    }
+    local enabled = uci:get("netaudit", "settings", "enabled") or "0"  -- 修改这里
+    local running = sys.call("pgrep -f '/usr/lib/lua/netaudit/analyzer.lua' >/dev/null") == 0
     
-    http.prepare_content("application/json")
-    http.write_json(status)
+    luci.http.prepare_content("application/json")
+    luci.http.write_json({
+        enabled = enabled == "1",
+        running = running,
+        service = running and "Running" or "Stopped"
+    })
 end
 
 function action_logs()
@@ -75,4 +74,5 @@ function action_get_stats()
     
     http.prepare_content("application/json")
     http.write_json(stats)
+
 end
