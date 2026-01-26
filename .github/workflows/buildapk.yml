@@ -27,7 +27,7 @@ jobs:
           #- luci-app-lucky
           #- luci-app-oaf
           #- luci-app-adguardhome
-          - luci-app-netaudit
+          - luci-app-audit
 
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
         id: timestamp
         run: |
           echo "time=$(TZ='Asia/Shanghai' date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
-          chmod 755 -R luci-app-netaudit
+          chmod 755 -R luci-app-audit/root/
         
 
       - name: Building packages for ${{ matrix.pakgs }}
