@@ -1,43 +1,42 @@
-local sys = require "luci.sys"
-local http = require "luci.http"
-local uci = require "luci.model.uci".cursor()
+m = Map("netaudit", translate("Network Audit Overview"), 
+    translate("Real-time network traffic monitoring and analysis"))
 
-m = Map("netaudit", translate("Network Audit - Overview"), 
-    translate("Network traffic monitoring and auditing overview"))
-
-s = m:section(TypedSection, "global", translate("Service Status"))
+s = m:section(TypedSection, "settings", translate("Service Status"))  -- 修改这里
 s.anonymous = true
 s.addremove = false
 
-status = s:option(DummyValue, "_status", translate("Service Status"))
-status.template = "netaudit/status"
+enabled = s:option(Flag, "enabled", translate("Enable Service"))
+enabled.rmempty = false
 
-btn = s:option(Button, "_control", translate("Service Control"))
-btn.inputtitle = translate("Restart Service")
-btn.inputstyle = "apply"
-function btn.write()
-    sys.call("/etc/init.d/netaudit restart >/dev/null 2>&1")
-    luci.http.redirect(luci.dispatcher.build_url("admin/services/netaudit/overview"))
-end
+log_level = s:option(ListValue, "log_level", translate("Log Level"))
+log_level:value("debug", "Debug")
+log_level:value("info", "Info")
+log_level:value("warning", "Warning")
+log_level:value("error", "Error")
+log_level.default = "info"
 
-s = m:section(TypedSection, "global", translate("Real-time Statistics"))
+s = m:section(TypedSection, "monitor", translate("Traffic Monitoring"))  -- 修改这里
 s.anonymous = true
+s.addremove = false
 
-traffic = s:option(DummyValue, "_traffic", translate("Total Traffic"))
-traffic.template = "netaudit/traffic_stats"
+sampling = s:option(Value, "sampling_rate", translate("Sampling Rate"), 
+    translate("Packets per second to sample (1-1000)"))
+sampling.datatype = "range(1,1000)"
+sampling.default = "100"
 
-connections = s:option(DummyValue, "_connections", translate("Active Connections"))
-connections.template = "netaudit/connection_stats"
+protocols = s:option(Value, "capture_protocols", translate("Protocols to Monitor"))
+protocols.default = "tcp udp icmp"
 
-log = s:option(TextValue, "_log", translate("Recent Logs"))
-log.rows = 10
-log.readonly = true
-function log.cfgvalue()
-    local log_file = "/var/log/netaudit.log"
-    if nixio.fs.access(log_file) then
-        return sys.exec("tail -20 " .. log_file)
-    end
-    return translate("No logs available")
-end
+s = m:section(TypedSection, "rules", translate("Security Filters"))  -- 修改这里
+s.anonymous = true
+s.addremove = false
+
+block = s:option(Flag, "block_suspicious", translate("Auto-block Suspicious Traffic"))
+block.rmempty = false
+
+alert_ports = s:option(DynamicList, "alert_ports", translate("Alert Ports"),
+    translate("Ports that trigger alerts when accessed"))
+alert_ports.datatype = "portrange"
+alert_ports.default = "22,23,3389"
 
 return m
