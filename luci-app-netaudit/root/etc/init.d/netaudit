@@ -1,47 +1,49 @@
 #!/bin/sh /etc/rc.common
 
+USE_PROCD=1
+PROG=/usr/lib/lua/netaudit/analyzer.lua
+NAME=netaudit
+
 START=99
 STOP=10
-USE_PROCD=1
-NAME=netaudit
-PROG=/usr/lib/netaudit/netaudit.sh
-CONFIG=/etc/config/netaudit
-LOG_FILE="/var/log/netaudit.log"
+
+boot() {
+    return 0
+}
 
 start_service() {
     procd_open_instance
-    procd_set_param command "$PROG"
+    procd_set_param command lua $PROG
+    procd_set_param respawn
+    procd_set_param respawn_retries 5
     procd_set_param stdout 1
     procd_set_param stderr 1
-    procd_set_param respawn ${respawn_threshold:-3600} ${respawn_timeout:-5} ${respawn_retry:-5}
-    procd_set_param file $CONFIG
-    procd_set_param user root
-    procd_set_param pidfile /var/run/$NAME.pid
+    procd_add_jail network
     procd_close_instance
     
-    echo "$(date): Network Audit service started" >> $LOG_FILE
+    # 应用nftables规则
+    if [ -f /etc/nftables.d/10-netaudit.nft ]; then
+        nft -f /etc/nftables.d/10-netaudit.nft
+    fi
+    
+    logger -t netaudit "Network Audit service started"
 }
 
 stop_service() {
-    [ -f /var/run/$NAME.pid ] && {
-        kill $(cat /var/run/$NAME.pid) 2>/dev/null
-        rm -f /var/run/$NAME.pid
-    }
+    # 清理nftables规则
+    nft delete table ip netaudit 2>/dev/null || true
     
-    echo "$(date): Network Audit service stopped" >> $LOG_FILE
+    logger -t netaudit "Network Audit service stopped"
 }
 
 reload_service() {
     stop
-    sleep 2
+    sleep 1
     start
 }
 
-boot() {
-    [ -f $CONFIG ] && {
-        uci -q get netaudit.@global[0].enabled | grep -q 1 && {
-            sleep 10
-            start
-        }
-    }
+restart() {
+    stop
+    sleep 2
+    start
 }
