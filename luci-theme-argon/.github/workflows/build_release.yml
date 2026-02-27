@@ -89,7 +89,7 @@ jobs:
           fi
 
       - name: 📦 Upload artifact for ${{ matrix.target }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.PKG_NAME }}-${{ matrix.target }}-${{ matrix.version }}
           path: |
@@ -107,7 +107,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: ⬇️ Download all build artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: ./release-assets
 
