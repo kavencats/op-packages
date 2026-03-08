@@ -58,17 +58,17 @@ var config = {
 	currentDirectory: '/', // Current directory
 	windowSizes: {
 		width: 800,
-		height: 500
+		height: 600
 	},
 
 	editorContainerSizes: {
 		text: {
 			width: 850,
-			height: 550
+			height: 650
 		},
 		hex: {
 			width: 850,
-			height: 550
+			height: 650
 		}
 	},
 
@@ -196,7 +196,7 @@ function saveConfig() {
 			// Use default sizes if invalid
 			config.editorContainerSizes[mode] = {
 				width: 850,
-				height: 550
+				height: 650
 			};
 		}
 	});
