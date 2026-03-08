@@ -58,17 +58,17 @@ var config = {
 	currentDirectory: '/', // Current directory
 	windowSizes: {
 		width: 800,
-		height: 600
+		height: 500
 	},
 
 	editorContainerSizes: {
 		text: {
 			width: 850,
-			height: 650
+			height: 550
 		},
 		hex: {
 			width: 850,
-			height: 650
+			height: 550
 		}
 	},
 
