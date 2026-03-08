@@ -2566,6 +2566,20 @@ body:not(.Interfaces) .cbi-rowstyle-2:first-child {
   margin-bottom: 0.5em;
   max-width: 100%;
 }
+
+.modal > .button-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal > .button-row > button:not(:last-of-type) {
+  margin-right: .5em;
+}
+
+.modal > .button-row > button:first-of-type {
+  margin-right: auto;
+}
+
 .modal > pre,
 .modal > textarea {
   font-size: 1rem;
