@@ -22,13 +22,13 @@ jobs:
           - openwrt-25.12
         pakgs:
           #- luci-app-msd_lite
-          - luci-app-ddns-go
+          #- luci-app-ddns-go
           - luci-theme-argon
-          - luci-app-lucky
-          - luci-app-oaf
-          - luci-app-adguardhome
-          - luci-app-smbuser
-          - luci-app-tcpdump
+          #- luci-app-lucky
+          #- luci-app-oaf
+          #- luci-app-adguardhome
+          #- luci-app-smbuser
+          #- luci-app-tcpdump
 
     steps:
       - uses: actions/checkout@v4
