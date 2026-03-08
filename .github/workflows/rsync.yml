@@ -34,11 +34,11 @@ jobs:
             ["luci-app-tcpdump"]="https://github.com/KFERMercer/luci-app-tcpdump"
             ["luci-app-smbuser"]="https://github.com/sbwml/luci-app-smbuser"
             ["luci-app-ddns-go"]="https://github.com/sirpdboy/luci-app-ddns-go"
-            ["luci-theme-argon"]="https://github.com/MomoFlora/luci-theme-argon"
+            #["luci-theme-argon"]="https://github.com/MomoFlora/luci-theme-argon"
             ["luci-app-msd_lite"]="https://github.com/zfdx123/msd_lite"
             ["luci-app-lucky"]="https://github.com/sirpdboy/luci-app-lucky"
             ["luci-app-oaf"]="https://github.com/destan19/OpenAppFilter"
-            ["luci-app-filemanager"]="https://github.com/sbwml/luci-app-filemanager"
+            #["luci-app-filemanager"]="https://github.com/sbwml/luci-app-filemanager"
             # 添加更多仓库，格式: ["本地目录"]="仓库URL"
             # ["another-repo"]="https://github.com/user/another-repo"
           )
