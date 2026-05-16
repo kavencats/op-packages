@@ -1,14 +1,17 @@
+#
+# Copyright (C) 2008-2019 Jerrykuku
+#
 # This is free software, licensed under the Apache License, Version 2.0 .
+#
 
 include $(TOPDIR)/rules.mk
 
-LUCI_TITLE:=LuCI File Manager module
-LUCI_DEPENDS:=+luci-base
+LUCI_TITLE:=Argon Theme
+LUCI_DEPENDS:=+wget +jsonfilter
+PKG_VERSION:=2.4.3
+PKG_RELEASE:=20250722
 
-PKG_LICENSE:=Apache-2.0
-PKG_VERSION:=1.0.1
-PKG_RELEASE:=1
-PKG_MAINTAINER:=Dmitry R <rdmitry0911@gmail.com>
+CONFIG_LUCI_CSSTIDY:=
 
 include $(TOPDIR)/feeds/luci/luci.mk
 

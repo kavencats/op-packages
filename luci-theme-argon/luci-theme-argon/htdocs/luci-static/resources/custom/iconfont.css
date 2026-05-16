@@ -1,0 +1,40 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 5120712 */
+  src: url('iconfont.woff2?t=1778116492228') format('woff2'),
+       url('iconfont.woff?t=1778116492228') format('woff'),
+       url('iconfont.ttf?t=1778116492228') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-shezhixiangdaohover:before {
+  content: "\e621";
+}
+
+.icon-jiaohuanji:before {
+  content: "\e72e";
+}
+
+.main>.main-left>.nav>li.slide>.menu[data-title=Modem]:before,
+.main>.main-left>.nav>li>a[data-title=Modem]:before {
+    font-family: 'iconfont' !important;
+    content: "\e72e" !important;
+    color: #0c93f3;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.main>.main-left>.nav>li.slide>.menu[data-title=Netwizard]:before,
+.main>.main-left>.nav>li>a[data-title=Netwizard]:before {
+    font-family: 'iconfont' !important;
+    content: "\e621" !important;
+    color: #11bc22;
+    font-size: 18px;
+    font-weight: 700;
+}

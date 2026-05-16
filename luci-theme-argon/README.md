@@ -1,161 +1,172 @@
-<!-- markdownlint-configure-file {
-  "MD013": {
-    "code_blocks": false,
-    "tables": false,
-    "line_length":200
-  },
-  "MD033": false,
-  "MD041": false
-} -->
+<p align="center">
+  <img src="https://img.shields.io/badge/OpenWrt-LuCI-1565C0?style=for-the-badge&logo=openwrt&logoColor=white" alt="OpenWrt" />
+  <img src="https://img.shields.io/badge/Theme-Argon-00BCD4?style=for-the-badge&logo=css3&logoColor=white" alt="Argon Theme" />
+  <img src="https://img.shields.io/badge/Version-2.4.3-4CAF50?style=for-the-badge" alt="Version" />
+  <img src="https://img.shields.io/badge/Branch-openwrt--25.12-FF5722?style=for-the-badge" alt="Branch" />
+</p>
 
-[license]: /LICENSE
-[license-badge]: https://img.shields.io/github/license/jerrykuku/luci-theme-argon?style=flat-square&a=1
-[prs]: https://github.com/jerrykuku/luci-theme-argon/pulls
-[prs-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
-[issues]: https://github.com/jerrykuku/luci-theme-argon/issues/new
-[issues-badge]: https://img.shields.io/badge/Issues-welcome-brightgreen.svg?style=flat-square
-[release]: https://github.com/jerrykuku/luci-theme-argon/releases
-[release-badge]: https://img.shields.io/github/v/release/jerrykuku/luci-theme-argon?style=flat-square
-[download]: https://github.com/jerrykuku/luci-theme-argon/releases
-[download-badge]: https://img.shields.io/github/downloads/jerrykuku/luci-theme-argon/total?style=flat-square
-[contact]: https://t.me/jerryk6
-[contact-badge]: https://img.shields.io/badge/Contact-telegram-blue?style=flat-square
-[en-us-link]: /README.md
-[zh-cn-link]: /README_ZH.md
-[en-us-release-log]: /RELEASE.md
-[zh-cn-release-log]: /RELEASE_ZH.md
-[config-link]: https://github.com/jerrykuku/luci-app-argon-config/releases
-[lede]: https://github.com/coolsnowwolf/lede
-[official]: https://github.com/openwrt/openwrt
-[immortalwrt]: https://github.com/immortalwrt/immortalwrt
+<h1 align="center">🎨 Argon Theme for OpenWrt LuCI</h1>
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/jerrykuku/staff/master/argon_title4.svg">
+<p align="center">
+  <strong>A clean, modern, and beautiful LuCI theme for OpenWrt</strong>
+</p>
 
-# A brand new OpenWrt LuCI theme
+<p align="center">
+  <a href="https://github.com/MomoFlora/luci-theme-argon">
+    <img src="https://img.shields.io/badge/GitHub-Repository-181717?style=flat-square&logo=github" alt="GitHub" />
+  </a>
+  <img src="https://img.shields.io/badge/License-Apache%202.0-orange?style=flat-square" alt="License" />
+  <img src="https://img.shields.io/badge/Author-jerrykuku-blue?style=flat-square" alt="Author" />
+  <img src="https://img.shields.io/badge/Platform-OpenWrt-lightgrey?style=flat-square" alt="Platform" />
+</p>
 
-Argon is **a clean and tidy OpenWrt LuCI theme** that allows<br/>
-users to customize their login interface with images or videos.  
-It also supports automatic and manual switching between light and dark modes.
+---
 
-[![license][license-badge]][license]
-[![prs][prs-badge]][prs]
-[![issues][issues-badge]][issues]
-[![release][release-badge]][release]
-[![download][download-badge]][download]
-[![contact][contact-badge]][contact]
+## ✨ Features
 
-**English** |
-[简体中文][zh-cn-link]
+- **Modern Design** - Clean and elegant interface with Material Design inspired
+- **Responsive Layout** - Perfect adaptation to desktop, tablet and mobile devices
+- **Dark/Light Mode** - Switch between light and dark themes freely
+- **Customizable** - Rich configuration options via LuCI app
+- **High Performance** - Optimized CSS and JavaScript for smooth experience
+- **Wallpaper Support** - Set custom background images
+- **Multi-language** - Built-in internationalization support
 
-[Key Features](#key-features) •
-[Branch](#branch-introduction) •
-[Version History](#version-history) •
-[Getting started](#getting-started) •
-[Screenshots](#screenshots) •
-[Contributors](#contributors) •
-[Credits](#credits)
+## 📦 Components
 
-<img src="https://raw.githubusercontent.com/jerrykuku/staff/master/argon2.gif">
-</div>
+### luci-theme-argon
 
-## Key Features
+The core theme package containing all UI assets and styles.
 
-- Clean Layout.
-- Adapted to mobile display.
-- Customizable theme colors.
-- Support for using Bing images as login background.
-- Support for custom uploading of images or videos as login background.
-- Automatically switch between light and dark modes with the system, and can also be set to a fixed mode.
-- Settings plugin with extensions [luci-app-argon-config][config-link]
+| Attribute | Value |
+|-----------|-------|
+| Version | 2.4.3 |
+| Release | 20250722 |
+| Dependencies | wget-any, jsonfilter |
+| License | Apache License 2.0 |
 
-> **Upcoming Version **
->
-> "The current theme uses Less for CSS construction, and the method for switching between light and dark modes is relatively primitive. Meanwhile, the official theme has already switched to the UT template. I am exploring a way to build the theme template using modern front-end development tools, initially settling on a solution using Vite + UnoCSS. This approach will utilize a proxy server for debugging and also support HMR (Hot Module Replacement), significantly improving development speed. Currently, the basic development framework has been set up, but due to a busy schedule, I still need some time to migrate the existing styles. Stay tuned!"
+### luci-app-argon-config
 
-## Branch Introduction
+Configuration application for customizing the Argon theme.
 
-There are currently two main branches that are adapted to different versions of the **OpenWrt** source code.  
-The table below will provide a detailed introduction:
+| Attribute | Value |
+|-----------|-------|
+| Version | 1.0 |
+| Release | 20230608 |
+| Dependencies | luci-theme-argon |
+| Config File | /etc/config/argon |
 
-| Branch | Version | Description                        | Matching source                                           |
-| ------ | ------- | ---------------------------------- | --------------------------------------------------------- |
-| master | v2.x.x  | Support the latest version of LuCI | [Official OpenWrt][official] • [ImmortalWrt][immortalwrt] |
-| 18.06 (deprecated) | v1.x.x  | Support the 18.06 version of LuCI   | [Lean's LEDE][lede]                                         |
+## 🚀 Installation
 
-## Version History
-
-The latest version is v2.4.3 [Click here][en-us-release-log] to view the full version history record.
-
-## Getting started
-
-### Build for Lean's LEDE project (deprecated)
+### Method 1: Compile from Source
 
 ```bash
-cd lede/package/lean
-rm -rf luci-theme-argon
-git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git luci-theme-argon
-make menuconfig #choose LUCI->Theme->Luci-theme-argon
-make -j1 V=s
+# Clone to your OpenWrt package directory (openwrt-25.12 branch)
+git clone -b openwrt-25.12 https://github.com/MomoFlora/luci-theme-argon.git package/luci-theme-argon
+
+# Update feeds and compile
+./scripts/feeds update -a
+./scripts/feeds install -a
+
+make menuconfig
+# Navigate to: LuCI -> Themes -> luci-theme-argon
+# Navigate to: LuCI -> Applications -> luci-app-argon-config
+
+make -j$(nproc)
 ```
 
-### Build for OpenWrt official SnapShots and ImmortalWrt
+### Method 2: Install via IPK
 
 ```bash
-cd openwrt/package
-git clone https://github.com/jerrykuku/luci-theme-argon.git
-make menuconfig #choose LUCI->Theme->Luci-theme-argon
-make -j1 V=s
+# Upload ipk files to your router
+scp *.ipk root@192.168.1.1:/tmp/
+
+# SSH into your router and install
+ssh root@192.168.1.1
+cd /tmp
+opkg install luci-theme-argon_*.ipk
+opkg install luci-app-argon-config_*.ipk
 ```
 
-### Install for LuCI 18.06 ( Lean's LEDE )
+## ⚙️ Configuration
 
-```bash
-wget --no-check-certificate https://github.com/jerrykuku/luci-theme-argon/releases/download/v1.8.2/luci-theme-argon_1.8.2-20230609_all.ipk
-opkg install luci-theme-argon*.ipk
+After installation, access the configuration panel:
+
+1. Log in to LuCI web interface
+2. Navigate to **System** → **Argon Config**
+3. Customize your preferences:
+   - Theme mode (Light/Dark/Auto)
+   - Background image
+   - Primary color
+   - Blur effect
+   - Transparency settings
+
+## 🖼️ Preview
+
+| Light Mode | Dark Mode |
+|------------|-----------|
+| Clean and bright interface | Elegant dark interface |
+
+## 📁 Project Structure
+
+```
+.
+├── luci-theme-argon/           # Theme core package
+│   ├── htdocs/                 # Web assets (CSS, JS, images)
+│   ├── less/                   # LESS source files
+│   ├── root/                   # System files
+│   ├── ucode/                  # Ucode templates
+│   └── Makefile                # Build configuration
+│
+├── luci-app-argon-config/      # Configuration application
+│   ├── htdocs/                 # Web assets
+│   ├── po/                     # Translation files
+│   ├── root/                   # System files
+│   └── Makefile                # Build configuration
+│
+└── README.md                   # Project documentation
 ```
 
-### Install for OpenWrt official SnapShots and ImmortalWrt
+## 📝 Changelog
 
-```bash
-opkg install luci-compat
-opkg install luci-lib-ipkg
-wget --no-check-certificate https://github.com/jerrykuku/luci-theme-argon/releases/download/v2.3.2/luci-theme-argon_2.3.2-r20250207_all.ipk
-opkg install luci-theme-argon*.ipk
+### v2.4.3 (2025-07-22)
+- Theme core updates and optimizations
+
+### v1.0 (2023-06-08)
+- Initial release of config application
+- Russian language support
+
+## 🤝 Credits
+
+- **Original Author**: [jerrykuku](https://github.com/jerrykuku)
+- **Current Maintainer**: [MomoFlora](https://github.com/MomoFlora)
+- **Repository**: https://github.com/MomoFlora/luci-theme-argon
+- **Branch**: openwrt-25.12
+- **License**: Apache License, Version 2.0
+- **Based on**: OpenWrt LuCI framework
+
+## 📄 License
+
+This project is licensed under the Apache License, Version 2.0.
+
+```
+Copyright (C) 2008-2019 Jerrykuku
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 ```
 
-### Install luci-app-argon-config
+---
 
-```bash
-wget --no-check-certificate -O luci-app-argon-config_0.9_all.ipk https://github.com/jerrykuku/luci-app-argon-config/releases/download/v0.9/luci-app-argon-config_0.9_all.ipk
-opkg install luci-app-argon-config*.ipk
-```
-
-## Notice
-
-- Chrome browser is highly recommended. There are some new css3 features used in this theme, currently only Chrome has the best compatibility.
-- Microsoft has officially retired Internet Explorer, RIP IE🙏<del>Currently, the mainline version of the IE series has bugs that need to be addressed.</del>
-- FireFox does not enable the backdrop-filter by default, [see here](https://developer.mozilla.org/zh-CN/docs/Web/CSS/backdrop-filter) for the opening method.
-
-## Screenshots
-
-![desktop](/Screenshots/screenshot_pc.jpg)
-![mobile](/Screenshots/screenshot_phone.jpg)
-
-## Contributors
-
-<a href="https://github.com/jerrykuku/luci-theme-argon/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jerrykuku/luci-theme-argon&v=2" />
-</a>
-
-Made with [contrib.rocks](https://contrib.rocks).
-
-## Related Projects
-
-- [luci-app-argon-config](https://github.com/jerrykuku/luci-app-argon-config): Argon theme config plugin
-- [openwrt-package](https://github.com/jerrykuku/openwrt-package): My OpenWrt package
-- [CasaOS](https://github.com/IceWhaleTech/CasaOS): A simple, easy-to-use, elegant open-source Personal Cloud system (My current main project)
-
-## Credits
-
-[luci-theme-material](https://github.com/LuttyYang/luci-theme-material/)
+<p align="center">
+  Made with ❤️ by the OpenWrt Community
+</p>

@@ -196,7 +196,7 @@ function saveConfig() {
 			// Use default sizes if invalid
 			config.editorContainerSizes[mode] = {
 				width: 850,
-				height: 650
+				height: 550
 			};
 		}
 	});
