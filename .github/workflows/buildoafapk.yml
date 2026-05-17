@@ -44,4 +44,5 @@ jobs:
           name: openappfilter-apks
           path: |
             bin/packages/aarch64_cortex-a53/base/luci-app-oaf_*.apk
+            bin/packages/aarch64_cortex-a53/base/appfilter_*.apk
             bin/packages/aarch64_cortex-a53/kernel/kmod-oaf_*.apk
