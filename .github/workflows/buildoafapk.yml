@@ -36,6 +36,7 @@ jobs:
         run: |
           make package/luci-app-oaf/compile V=s
           make package/kmod-oaf/compile V=s
+          make package/open-app-filter/compile V=s
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v6.0.0
