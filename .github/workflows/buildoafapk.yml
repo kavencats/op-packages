@@ -16,7 +16,7 @@ jobs:
       - name: Setup OpenWrt SDK
         uses: sbwml/openwrt-gh-action-sdk@main
         with:
-          sdk-version: '25.12-rc2'
+          sdk-version: '25.12.4'
           target: 'aarch64_cortex-a53'
           arch: 'aarch64'
           toolchain: 'gcc-13.2.1'
