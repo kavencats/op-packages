@@ -1,14 +1,22 @@
 #!/bin/sh
 
+# === Core security: self-background operation mechanism ===
+if [ "$1" != "bg_run" ]; then
+    rm -f /var/run/update_core* /tmp/AdGuardHome_update.log
+    touch /var/run/update_core
+    /usr/share/AdGuardHome/update_core.sh bg_run "$1" </dev/null >/tmp/AdGuardHome_update.log 2>&1 &
+    exit 0
+fi
+
+shift
+# ==========================================================
+
 PATH="/usr/sbin:/usr/bin:/sbin:/bin"
 binpath="/usr/bin/AdGuardHome"
 update_mode=$1
 
-upxflag=$(uci get AdGuardHome.AdGuardHome.upxflag 2>/dev/null || true)
-[ -z "${upxflag}" ] && upxflag=off
-enabled=$(uci get AdGuardHome.AdGuardHome.enabled 2>/dev/null || true)
-core_version=$(uci get AdGuardHome.AdGuardHome.core_version 2>/dev/null || true)
-update_url=$(uci get AdGuardHome.AdGuardHome.update_url 2>/dev/null || true)
+core_version=$(uci get adguardhome.config.core_version 2>/dev/null || true)
+update_url=$(uci get adguardhome.config.update_url 2>/dev/null || true)
 
 case "${core_version}" in
 beta)
@@ -18,6 +26,19 @@ beta)
 	core_api_url=https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest
 	;;
 esac
+
+EXIT(){
+    rm -rf /var/run/update_core /tmp/AdGuardHome_Update 2>/dev/null
+    if [ "$1" != "0" ]; then
+        touch /var/run/update_core_error
+    fi
+    exit $1
+}
+
+trap "EXIT 1" SIGTERM SIGINT
+
+rm -rf /var/run/update_core_error /var/run/update_core_done 2>/dev/null
+touch /var/run/update_core
 
 Check_Task(){
     running_tasks="$(ps w | grep -v grep | grep 'AdGuardHome' | grep 'update_core' | wc -l)"
@@ -87,31 +108,9 @@ Check_Updates(){
 	EXIT 0
 }
 
-UPX_Compress(){
-	GET_Arch
-	upx_name="upx-${upx_latest_ver}-${Arch_upx}_linux.tar.xz"
-	echo -e "开始下载 ${upx_name} ...\n"
-	$Downloader /tmp/upx-${upx_latest_ver}-${Arch_upx}_linux.tar.xz "https://github.com/upx/upx/releases/download/v${upx_latest_ver}/${upx_name}"
-	if [ ! -e "/tmp/upx-${upx_latest_ver}-${Arch_upx}_linux.tar.xz" ]; then
-		echo -e "\n${upx_name} 下载失败!\n" 
-		EXIT 1
-	else
-		echo -e "\n${upx_name} 下载成功!\n" 
-	fi
-	if ! command -v xz >/dev/null 2>&1; then
-		echo "xz not found, attempting to install..." >&2
-		opkg update >/dev/null 2>&1 || true
-		opkg install xz >/dev/null 2>&1 || { echo "软件包 xz 安装失败!" >&2; EXIT 1; }
-	fi
-	mkdir -p /tmp/upx-${upx_latest_ver}-${Arch_upx}_linux
-	echo -e "正在解压 ${upx_name} ...\n" 
-	xz -d -c /tmp/upx-${upx_latest_ver}-${Arch_upx}_linux.tar.xz | tar -x -C "/tmp"
-	[ ! -f "/tmp/upx-${upx_latest_ver}-${Arch_upx}_linux/upx" ] && echo -e "\n${upx_name} 解压失败!" && EXIT 1
-}
-
 Update_Core(){
 	rm -rf "/tmp/AdGuardHome_Update" > /dev/null 2>&1
-	mkdir -p "/tmp/AdGuardHome_Update" || { echo "无法创建临时目录"; EXIT 1; }
+	mkdir -p "/tmp/AdGuardHome_Update" || { echo "Unable to create a temporary directory"; EXIT 1; }
 
 	GET_Arch
 	eval link="${update_url}"
@@ -145,35 +144,23 @@ Update_Core(){
 	chmod +x "${downloadbin}" 2>/dev/null || true
 	echo "Core size: $(awk 'BEGIN{printf "%.2fMB\n",'$((`ls -l $downloadbin | awk '{print $5}'`))'/1000000}')"
 
-	if [ "${upxflag}" != "off" ]; then
-		UPX_Compress
-		echo "UPX compression enabled, this may take a while ..."
-		/tmp/upx-${upx_latest_ver}-${Arch_upx}_linux/upx $upxflag $downloadbin > /dev/null 2>&1
-		echo "\n压缩后的核心体积: $(awk 'BEGIN{printf "%.2fMB\n",'$((`ls -l $downloadbin | awk '{print $5}'`))'/1000000}')"
-	else
-		echo "UPX compression disabled, skipping ..."
-	fi
-
 	/etc/init.d/AdGuardHome stop > /dev/null 2>&1
 	echo "Moving AdGuardHome binary to ${binpath%/*} ..."
 
 	if ! mv -f "${downloadbin}" "${binpath}"; then
-		echo -e "AdGuardHome 核心移动失败!\n可能是设备空间不足导致, 请尝试开启 UPX 压缩。"
+		echo -e "The core movement failed! \nIt may be caused by insufficient space."
 		rm -rf "/tmp/AdGuardHome_Update"
 		EXIT 1
 	fi
 
-	rm -f /tmp/upx*.tar.xz
-	rm -rf /tmp/upx* /tmp/AdGuardHome_Update
+	rm -rf /tmp/AdGuardHome_Update
 	chmod +x ${binpath}
-
-	if [ "${enabled}" = 1 ]; then
-		echo "Restarting AdGuardHome service ..."
-		/etc/init.d/AdGuardHome restart
-	fi
+    echo "Restarting AdGuardHome service ..."
+    /etc/init.d/adguardhome restart > /dev/null 2>&1
 
 	echo "AdGuardHome core updated successfully!"
 	touch /var/run/update_core_done
+    EXIT 0
 }
 
 GET_Arch() {
@@ -216,32 +203,13 @@ GET_Arch() {
 		echo "Unsupported architecture: [${Archt}]" 
 		EXIT 1
 	esac
-	case "${Archt}" in
-	mipsel)
-		Arch_upx="mipsel"
-		upx_latest_ver="3.95"
-	;;
-	*)
-		Arch_upx="${Arch}"
-		upx_latest_ver="$(${_Downloader} https://api.github.com/repos/upx/upx/releases/latest 2>/dev/null | egrep 'tag_name' | egrep '[0-9.]+' -o 2>/dev/null)"
-
-	esac
     echo "Detected architecture: ${Arch}"
 }
 
-EXIT(){
-	rm -rf /var/run/update_core $LOCKU 2>/dev/null
-	[ "$1" != 0 ] && touch /var/run/update_core_error
-	exit $1
-}
 
 main(){
 	Check_Task ${update_mode}
 	Check_Updates ${update_mode}
 }
-
-trap "EXIT 1" SIGTERM SIGINT
-touch /var/run/update_core
-rm - rf /var/run/update_core_error 2>/dev/null
 
 main

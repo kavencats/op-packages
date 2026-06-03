@@ -1,43 +1,47 @@
 permissions:
   contents: write
-name: Build OpenWrt Package
+name: Build luci-app-adguardhome Package
 
 on:
   push:
     branches:
-      - master
-    paths:
-      - 'Makefile'
-      - 'luasrc/**'
-      - 'root/**'
-      - '!**/.github/**'
+      - main
+    paths-ignore:
+      - '.github/**'
+      - '.upstream_meta'
+      - 'README.md'
+      - 'LICENSE'
+      - 'SECURITY.md'
   workflow_dispatch:
 
 jobs:
   check:
-    name: 1. Check if build is required
+    name: 1. Resolve Version
     runs-on: ubuntu-latest
     outputs:
       should_build: ${{ steps.check_release.outputs.should_build }}
       tag_name: ${{ steps.version.outputs.tag_name }}
       main_version: ${{ steps.version.outputs.main_version }}
-      main_full_version: ${{ steps.version.outputs.main_full_version }}
-
+      
     steps:
       - name: 🧾 Checkout repo
         uses: actions/checkout@v6
 
-      - name: 🏷️ Extract version info from Makefile
+      - name: 🏷️ Extract version info from Git Commit
         id: version
         run: |
-          PKG_VERSION=$(grep -E '^PKG_VERSION *:?=' Makefile | head -n1 | cut -d= -f2 | tr -d '[:space:]')
-          PKG_RELEASE=$(grep -E '^PKG_RELEASE *:?=' Makefile | head -n1 | cut -d= -f2 | tr -d '[:space:]')
-          COMBINED_VERSION="v${PKG_VERSION}-r${PKG_RELEASE}"
-          
-          echo "tag_name=${COMBINED_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "main_version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
-          echo "main_full_version=$COMBINED_VERSION" >> "$GITHUB_OUTPUT"
-          echo "📦 Detected Version: $COMBINED_VERSION"
+          set -euo pipefail
+
+          COMMIT_TIMESTAMP=$(git log -1 --format=%ct)
+          COMMIT_SHA=$(git rev-parse --short=7 HEAD)
+
+          PKG_VERSION_DATE=$(date -u -d "@${COMMIT_TIMESTAMP}" +'%y.%j')
+          PKG_VERSION_SECS=$(printf "%05d" $(( COMMIT_TIMESTAMP % 86400 )))
+          OFFICIAL_VERSION="${PKG_VERSION_DATE}.${PKG_VERSION_SECS}~${COMMIT_SHA}"
+          GIT_TAG_VERSION="${PKG_VERSION_DATE}.${PKG_VERSION_SECS}"
+
+          echo "tag_name=v${GIT_TAG_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "main_version=${OFFICIAL_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: 🧐 Check if release exists
         id: check_release
@@ -59,7 +63,7 @@ jobs:
           fi
 
   build:
-    name: 2. Build for ${{ matrix.version }} / ${{ matrix.target }}
+    name: Build for ${{ matrix.version }} / ${{ matrix.target }}
     needs: check
     if: needs.check.outputs.should_build == 'true'
     runs-on: ubuntu-latest
@@ -79,31 +83,50 @@ jobs:
       - name: 🧾 Checkout repo
         uses: actions/checkout@v6
 
-      - name: 📛 Set Environment
-        run: |
-          echo "PKG_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
-          echo "ARCH=${{ matrix.target }}-${{ matrix.version }}" >> "$GITHUB_ENV"
+      - name: 📛 Set PKG_NAME from repo
+        run: echo "PKG_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
 
       - name: 🧰 Set up Feed structure
         run: |
           set -e
-          # Also add a shim so ../../luci.mk from package/feeds/jackie264/<pkg> works:
           mkdir -p package
           printf 'include $(TOPDIR)/feeds/luci/luci.mk\n' > package/luci.mk
 
-          # LuCI-style layout so ../../luci.mk resolves from applications/<pkg>
           mkdir -p feed/luci/applications/${PKG_NAME}
 
-          # Add shim luci/luci.mk pointing to the official LuCI feed
           mkdir -p feed/luci
           printf 'include $(TOPDIR)/feeds/luci/luci.mk\n' > feed/luci/luci.mk
 
-          # Copy the package sources into the feed subdir (exclude CI and feed itself)
           rsync -av \
             --exclude='.git' \
             --exclude='feed' \
             --exclude='.github' \
+            --exclude='patches' \
+            --exclude='SECURITY.md' \
+            --exclude='README.md' \
+            --exclude='.upstream_meta' \
             ./ feed/luci/applications/${PKG_NAME}/
+
+      - name: 🩹 Patch Makefile with dynamic version
+        id: patch_version
+        run: |
+          set -euo pipefail
+          OFFICIAL_VERSION="${{ needs.check.outputs.main_version }}"
+          echo "🚀 Using official standard version: ${OFFICIAL_VERSION}"
+
+          MF="feed/luci/applications/${PKG_NAME}/Makefile"
+          sed -i '/^PKG_VERSION/d' "$MF"
+          sed -i '/^PKG_RELEASE/d' "$MF"
+          sed -i "/^LUCI_NAME/a PKG_RELEASE:=" "$MF"
+          sed -i "/^LUCI_NAME/a PKG_VERSION:=${OFFICIAL_VERSION}" "$MF"
+
+          echo "✅ Patched Makefile metadata:"
+          echo "--- 📄 Full Makefile Content Preview ---"
+          cat "$MF"
+          
+      - name: 🧮 Compute ARCH
+        run: |
+          echo "ARCH=${{ matrix.target }}-${{ matrix.version }}" >> "$GITHUB_ENV"
 
       - name: 🏗️ Build with OpenWrt SDK
         uses: openwrt/gh-action-sdk@v11
@@ -139,14 +162,16 @@ jobs:
           if-no-files-found: ignore
 
   release:
-    name: 3. Release ${{ github.repository }}
+    name: 3. Release & Deploy ${{ github.repository }}
     needs: [check, build]
+    if: needs.check.outputs.should_build == 'true'
     runs-on: ubuntu-latest
+
     steps:
       - name: 🧾 Checkout repo
         uses: actions/checkout@v6
 
-      - name: ⬇️ Download all artifacts
+      - name: ⬇️ Download all build artifacts
         uses: actions/download-artifact@v8
         with:
           path: ./release-assets
@@ -154,8 +179,8 @@ jobs:
       - name: 🗃️ Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ needs.check.outputs.main_full_version }}
-          name: Build -${{ needs.check.outputs.main_full_version }}
+          tag_name: ${{ needs.check.outputs.tag_name }}
+          name: Build-${{ needs.check.outputs.tag_name }}
           files: |
             ./release-assets/**/*.ipk
             ./release-assets/**/*.apk
@@ -175,12 +200,11 @@ jobs:
         run: |
           set -e
           CURRENT_PKG="${{ github.event.repository.name }}"
-          mkdir -p custom-packages/releases/packages-24.10/luci custom-packages/releases/packages-25.12/luci
-
+          mkdir -p custom-packages/releases/packages-24.10/luci
+          mkdir -p custom-packages/releases/packages-25.12/luci
           echo "Cleaning all old versions for $CURRENT_PKG before updating..."
           rm -f custom-packages/releases/packages-24.10/luci/${CURRENT_PKG}_*.ipk
           rm -f custom-packages/releases/packages-25.12/luci/${CURRENT_PKG}-*.apk
-
           find ./release-assets -type f \( -name "*.ipk" -o -name "*.apk" \) | while read -r f; do
             base=$(basename "$f")
             if [[ "$base" == *.ipk ]]; then
@@ -199,9 +223,8 @@ jobs:
           cd custom-packages
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add releases/packages-24.10/luci/ releases/packages-25.12/luci/ 2>/dev/null || true
-          git commit -m "Update $CURRENT_PKG to ${{ needs.check.outputs.main_full_version }}" || exit 0
-          
+          git add releases/packages-24.10/luci/ releases/packages-25.12/luci/
+          git commit -m "Update $CURRENT_PKG to ${{ needs.check.outputs.tag_name }}" || echo "No changes"
           for i in {1..5}; do
             git pull --rebase origin main && \
             git push origin main && break || \
