@@ -1,1 +1,154 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
 
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:244
+msgid ""
+"Go 运行时的一个软内存上限，允许垃圾回收器在使用接近限制时更频繁地运行，以防止内存不足（OOM）杀死进程。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:113
+#: applications/luci-app-adguardhome/root/usr/share/luci/menu.d/luci-app-adguardhome.json:3
+msgid "AdGuard Home"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:137
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:199
+msgid "高级设置"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:146
+msgid "配置文件"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:89
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:147
+msgid ""
+"配置文件必须存储在其自己的目录中，而不能存储在 '/etc'。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:159
+msgid "存储过滤器、日志和统计信息的目录。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:132
+msgid "文件系统访问"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:133
+msgid ""
+"AdGuard Home 应该具有只读或读写访问权限的文件和目录。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:129
+msgid "常规设置"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:138
+msgid ""
+"用于调整垃圾回收器和内存管理的 Go 环境变量。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/root/usr/share/rpcd/acl.d/luci-app-adguardhome.json:3
+msgid "为 AdGuard Home LuCI 应用授予权限"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:181
+msgid "将服务运行分组到下列类别。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:149
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:161
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:171
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:181
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:217
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:232
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:247
+msgid "如果为空，则默认为"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:139
+msgid "自行修改，风险自负。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:24
+msgid "未运行"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:148
+msgid "父目录将由服务用户拥有。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:83
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:99
+msgid "路径必须是绝对路径。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:86
+msgid "路径不能以斜杠结尾。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:207
+msgid "只读访问"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:208
+msgid "读写访问"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:23
+msgid "运行"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:122
+msgid "服务状态"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:180
+msgid "服务组"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:170
+msgid "服务使用者"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:230
+msgid ""
+"可以同时执行用户级 Go 代码的操作系统线程的最大数量。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:215
+msgid ""
+"通过设置百分比来调整垃圾回收器的积极性在触发下一次垃圾回收周期之前允许的堆增长量。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:171
+msgid "用户正在运行该服务。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:191
+msgid "详细日志记录"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:119
+msgid "版本"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:160
+msgid "将由服务使用者拥有。"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:158
+msgid "工作目录"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:247
+msgid "未设置"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:217
+msgid "未设置和100"
+msgstr ""
+
+#: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:232
+msgid "未设置且与 CPU 数量匹配"
+msgstr ""
