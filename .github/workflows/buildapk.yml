@@ -21,18 +21,18 @@ jobs:
         SDK:
           - openwrt-25.12
         pakgs:
-          #- luci-app-msd_lite
-          #- luci-app-ddns-go
-          #- luci-theme-argon
-          #- luci-app-lucky
+          - luci-app-msd_lite
+          - luci-app-ddns-go
+          - luci-theme-argon
+          - luci-app-lucky
           #- luci-app-oaf
           - luci-app-adguardhome
-          #- luci-app-smbuser
-          #- luci-app-tcpdump
-          #- luci-app-filemanager
+          - luci-app-smbuser
+          - luci-app-tcpdump
+          - luci-app-filemanager
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -60,7 +60,7 @@ jobs:
           path: bin/packages/${{ matrix.arch }}/packages_ci/*.apk
 
       - name: Upload packages for ${{ matrix.pakgs }}
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@v1.21.0
         with:
           tag: ${{ github.event.inputs.version || 'manual-build' }}-${{ matrix.arch }}
           name: "${{ github.event.inputs.version || 'Manual Build' }} (${{ matrix.arch }})"
