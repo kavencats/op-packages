@@ -7,59 +7,45 @@ on:
         description: 'Package version (e.g. v1.0.0)'
         required: false
         default: 'manual-build'
-      arches:
-        description: '目标架构，多个用逗号分隔，例如: mipsel_24kc,aarch64_cortex-a53'
-        required: true
-        default: 'mipsel_24kc,aarch64_cortex-a53'
-      packages:
-        description: '插件包名，多个用逗号分隔，例如: luci-app-msd_lite,luci-app-ddns-go'
-        required: true
-        default: 'luci-app-msd_lite,luci-app-ddns-go,luci-theme-argon,luci-app-lucky,luci-app-adguardhome,luci-app-smbuser,luci-app-tcpdump,luci-app-filemanager'
 
 jobs:
-  setup:
-    name: Setup build matrix
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.generate-matrix.outputs.matrix }}
-    steps:
-      - id: generate-matrix
-        env:
-          INPUT_ARCHES: ${{ github.event.inputs.arches }}
-          INPUT_PKGS: ${{ github.event.inputs.packages }}
-        run: |
-          python3 << EOF
-import os, json
-arches = os.environ['INPUT_ARCHES'].replace(' ', '').split(',')
-pkgs   = os.environ['INPUT_PKGS'].replace(' ', '').split(',')
-matrix = json.dumps({'arch': arches, 'pakgs': pkgs}, separators=(',',':'))
-with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-    f.write(f'matrix={matrix}\n')
-EOF
-
   build:
     name: Build ${{ matrix.arch }}-${{ matrix.pakgs }}
-    needs: setup
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
+      matrix:
+        arch:
+          - mipsel_24kc
+          - aarch64_cortex-a53
+        SDK:
+          - openwrt-25.12
+        pakgs:
+          - luci-app-msd_lite
+          - luci-app-ddns-go
+          - luci-theme-argon
+          - luci-app-lucky
+          - luci-app-adguardhome
+          - luci-app-smbuser
+          - luci-app-tcpdump
+          - luci-app-filemanager
 
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
+      # 生成时间戳
       - name: Generate timestamp
         id: timestamp
         run: |
           echo "time=$(TZ='Asia/Shanghai' date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
-          chmod 755 -R luci-app-audit/root/
+        
 
       - name: Building packages for ${{ matrix.pakgs }}
         uses: sbwml/openwrt-gh-action-sdk@main
         env:
-          ARCH: ${{ matrix.arch }}-openwrt-25.12
+          ARCH: ${{ matrix.arch }}-${{ matrix.SDK }}
           FEEDNAME: packages_ci
           PACKAGES: ${{ matrix.pakgs }}
           NO_REFRESH_CHECK: true
@@ -68,7 +54,7 @@ EOF
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.arch }}-openwrt-25.12-${{ matrix.pakgs }}-${{ steps.timestamp.outputs.time }}
+          name: ${{ matrix.arch }}-${{ matrix.SDK }}-${{ matrix.pakgs }}-${{ steps.timestamp.outputs.time }}
           path: bin/packages/${{ matrix.arch }}/packages_ci/*.apk
 
       - name: Upload packages for ${{ matrix.pakgs }}
@@ -84,5 +70,5 @@ EOF
             ## Package Information
             - Architecture: ${{ matrix.arch }}
             - Package: ${{ matrix.pakgs }}
-            - SDK: openwrt-25.12
+            - SDK: ${{ matrix.SDK }}
             - Build Time: ${{ steps.timestamp.outputs.time }}
