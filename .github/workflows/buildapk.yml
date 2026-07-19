@@ -7,29 +7,36 @@ on:
         description: 'Package version (e.g. v1.0.0)'
         required: false
         default: 'manual-build'
+      arches:
+        description: '目标架构，多个用逗号分隔，例如: mipsel_24kc,aarch64_cortex-a53'
+        required: true
+        default: 'mipsel_24kc,aarch64_cortex-a53'
+      packages:
+        description: '插件包名，多个用逗号分隔，例如: luci-app-msd_lite,luci-app-ddns-go'
+        required: true
+        default: 'luci-app-msd_lite,luci-app-ddns-go,luci-theme-argon,luci-app-lucky,luci-app-adguardhome,luci-app-smbuser,luci-app-tcpdump,luci-app-filemanager'
 
 jobs:
+  setup:
+    name: Setup build matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.generate-matrix.outputs.matrix }}
+    steps:
+      - id: generate-matrix
+        run: |
+          # 将逗号分隔的字符串转为 JSON 数组
+          arches_json=$(echo '${{ github.event.inputs.arches }}' | jq -R 'split(",") | map(gsub("^\\s+|\\s+$";""))')
+          packages_json=$(echo '${{ github.event.inputs.packages }}' | jq -R 'split(",") | map(gsub("^\\s+|\\s+$";""))')
+          echo "matrix={\"arch\":$arches_json,\"pakgs\":$packages_json}" >> $GITHUB_OUTPUT
+
   build:
     name: Build ${{ matrix.arch }}-${{ matrix.pakgs }}
+    needs: setup
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        arch:
-          - mipsel_24kc
-          - aarch64_cortex-a53
-        SDK:
-          - openwrt-25.12
-        pakgs:
-          - luci-app-msd_lite
-          - luci-app-ddns-go
-          - luci-theme-argon
-          - luci-app-lucky
-          #- luci-app-oaf
-          - luci-app-adguardhome
-          - luci-app-smbuser
-          - luci-app-tcpdump
-          - luci-app-filemanager
+      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
 
     steps:
       - uses: actions/checkout@v7
@@ -41,13 +48,11 @@ jobs:
         id: timestamp
         run: |
           echo "time=$(TZ='Asia/Shanghai' date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
-          chmod 755 -R luci-app-audit/root/
-        
 
       - name: Building packages for ${{ matrix.pakgs }}
         uses: sbwml/openwrt-gh-action-sdk@main
         env:
-          ARCH: ${{ matrix.arch }}-${{ matrix.SDK }}
+          ARCH: ${{ matrix.arch }}-openwrt-25.12
           FEEDNAME: packages_ci
           PACKAGES: ${{ matrix.pakgs }}
           NO_REFRESH_CHECK: true
@@ -56,7 +61,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.arch }}-${{ matrix.SDK }}-${{ matrix.pakgs }}-${{ steps.timestamp.outputs.time }}
+          name: ${{ matrix.arch }}-openwrt-25.12-${{ matrix.pakgs }}-${{ steps.timestamp.outputs.time }}
           path: bin/packages/${{ matrix.arch }}/packages_ci/*.apk
 
       - name: Upload packages for ${{ matrix.pakgs }}
@@ -72,5 +77,5 @@ jobs:
             ## Package Information
             - Architecture: ${{ matrix.arch }}
             - Package: ${{ matrix.pakgs }}
-            - SDK: ${{ matrix.SDK }}
+            - SDK: openwrt-25.12
             - Build Time: ${{ steps.timestamp.outputs.time }}
