@@ -30,9 +30,7 @@ var bg_path = '/www/luci-static/argon/background/';
 var trans_set = [0, 0.1, 0.2, 0.3, 0.4,
 	0.5, 0.6, 0.7, 0.8, 0.9, 1 ];
 
-// --- 新增：颜色选择器辅助函数 ---
 function createColorPicker(textInput) {
-	if (!textInput) return;
 	const colorPicker = document.createElement('input');
 	colorPicker.type = 'color';
 	colorPicker.value = textInput.value;
@@ -42,10 +40,7 @@ function createColorPicker(textInput) {
 	colorPicker.style.marginLeft = '5px';
 	colorPicker.style.borderRadius = '4px';
 	colorPicker.style.border = '1px solid #d9d9d9';
-	colorPicker.style.verticalAlign = 'middle';
-	
 	textInput.parentNode.insertBefore(colorPicker, textInput.nextSibling);
-	
 	colorPicker.addEventListener('input', function() {
 		textInput.value = colorPicker.value;
 	});
@@ -53,7 +48,6 @@ function createColorPicker(textInput) {
 		colorPicker.value = textInput.value;
 	});
 }
-// ----------------------------
 
 return view.extend({
 	load: function() {
@@ -78,7 +72,6 @@ return view.extend({
 		o.value('none', _('Built-in'));
 		o.value('bing', _('Bing'));
 		o.value('unsplash', _('Unsplash'));
-		o.value('wallhaven', _('Wallhaven'));
 		o.default = 'bing';
 		o.rmempty = false;
 
@@ -89,7 +82,12 @@ return view.extend({
 		o.default = 'normal';
 		o.rmempty = false;
 
-		// 修改：[Light mode] Primary Color
+		o = s.option(form.ListValue, 'font_weight', _('Font'));
+		o.value('normal', _('Normal'));
+		o.value('600', _('Bold'));
+		o.default = '600';
+		o.rmempty = false;
+
 		o = s.option(form.Value, 'primary', _('[Light mode] Primary Color'), _('A HEX color (default: #5e72e4).'))
 		o.default = '#5e72e4';
 		o.rmempty = false;
@@ -99,7 +97,6 @@ return view.extend({
 					_('Expecting: %s').format(_('valid HEX color value'));
 			return true;
 		};
-		// 新增：挂载选择器
 		o.render = function(section_id, option_index, cfgvalue) {
 			var el = form.Value.prototype.render.apply(this, arguments);
 			setTimeout(function() {
@@ -122,7 +119,24 @@ return view.extend({
 		o.default = '10';
 		o.rmempty = false;
 
-		// 修改：[Dark mode] Primary Color
+		o = s.option(form.Value, 'progressbar_font', _('[Light mode] Progress bar Font Color'), _('A HEX color (default: #2e2b60).'))
+		o.default = '#2e2b60';
+		o.rmempty = false;
+		o.validate = function(section_id, value) {
+			if (section_id)
+				return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value) ||
+					_('Expecting: %s').format(_('valid HEX color value'));
+			return true;
+		};
+		o.render = function(section_id, option_index, cfgvalue) {
+			var el = form.Value.prototype.render.apply(this, arguments);
+			setTimeout(function() {
+				const textInput = document.querySelector('[id^="widget.cbid.argon."][id$=".progressbar_font"]');
+				createColorPicker(textInput);
+			}, 0);
+			return el;
+		};
+
 		o = s.option(form.Value, 'dark_primary', _('[Dark mode] Primary Color'),
 			_('A HEX Color (default: #483d8b).'))
 		o.default = '#483d8b';
@@ -133,7 +147,6 @@ return view.extend({
 					_('Expecting: %s').format(_('valid HEX color value'));
 			return true;
 		};
-		// 新增：挂载选择器
 		o.render = function(section_id, option_index, cfgvalue) {
 			var el = form.Value.prototype.render.apply(this, arguments);
 			setTimeout(function() {
