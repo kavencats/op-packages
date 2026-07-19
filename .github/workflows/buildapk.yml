@@ -27,12 +27,11 @@ jobs:
         run: |
           # 使用 Python 生成紧凑 JSON，避免 shell 和 jq 的格式问题
           MATRIX_JSON=$(python3 -c "
-import sys, json
-arches = '${{ github.event.inputs.arches }}'.replace(' ', '').split(',')
-pkgs = '${{ github.event.inputs.packages }}'.replace(' ', '').split(',')
-# 输出无空格紧凑 JSON
-print(json.dumps({'arch': arches, 'pakgs': pkgs}, separators=(',',':')))
-")
+            import sys, json
+            arches = '${{ github.event.inputs.arches }}'.replace(' ', '').split(',')
+            pkgs = '${{ github.event.inputs.packages }}'.replace(' ', '').split(',')
+            print(json.dumps({'arch': arches, 'pakgs': pkgs}, separators=(',',':')))
+            ")
           echo "matrix=${MATRIX_JSON}" >> $GITHUB_OUTPUT
 
   build:
