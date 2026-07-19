@@ -25,10 +25,12 @@ jobs:
     steps:
       - id: generate-matrix
         run: |
-          # 将逗号分隔的字符串转为 JSON 数组
-          arches_json=$(echo '${{ github.event.inputs.arches }}' | jq -R 'split(",") | map(gsub("^\\s+|\\s+$";""))')
-          packages_json=$(echo '${{ github.event.inputs.packages }}' | jq -R 'split(",") | map(gsub("^\\s+|\\s+$";""))')
-          echo "matrix={\"arch\":$arches_json,\"pakgs\":$packages_json}" >> $GITHUB_OUTPUT
+          # 使用 jq 构建安全的 JSON 矩阵，自动处理空格和换行
+          MATRIX_JSON=$(jq -n \
+            --arg arches "${{ github.event.inputs.arches }}" \
+            --arg pkgs "${{ github.event.inputs.packages }}" \
+            '{arch: ($arches | gsub(" "; "") | split(",")), pakgs: ($pkgs | gsub(" "; "") | split(","))}')
+          echo "matrix=${MATRIX_JSON}" >> $GITHUB_OUTPUT
 
   build:
     name: Build ${{ matrix.arch }}-${{ matrix.pakgs }}
