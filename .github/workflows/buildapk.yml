@@ -24,15 +24,18 @@ jobs:
       matrix: ${{ steps.generate-matrix.outputs.matrix }}
     steps:
       - id: generate-matrix
+        env:
+          INPUT_ARCHES: ${{ github.event.inputs.arches }}
+          INPUT_PKGS: ${{ github.event.inputs.packages }}
         run: |
-          # 使用 Python 生成紧凑 JSON，避免 shell 和 jq 的格式问题
-          MATRIX_JSON=$(python3 -c "
-            import sys, json
-            arches = '${{ github.event.inputs.arches }}'.replace(' ', '').split(',')
-            pkgs = '${{ github.event.inputs.packages }}'.replace(' ', '').split(',')
-            print(json.dumps({'arch': arches, 'pakgs': pkgs}, separators=(',',':')))
-            ")
-          echo "matrix=${MATRIX_JSON}" >> $GITHUB_OUTPUT
+          python3 << EOF
+import os, json
+arches = os.environ['INPUT_ARCHES'].replace(' ', '').split(',')
+pkgs   = os.environ['INPUT_PKGS'].replace(' ', '').split(',')
+matrix = json.dumps({'arch': arches, 'pakgs': pkgs}, separators=(',',':'))
+with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+    f.write(f'matrix={matrix}\n')
+EOF
 
   build:
     name: Build ${{ matrix.arch }}-${{ matrix.pakgs }}
@@ -51,6 +54,7 @@ jobs:
         id: timestamp
         run: |
           echo "time=$(TZ='Asia/Shanghai' date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+          chmod 755 -R luci-app-audit/root/
 
       - name: Building packages for ${{ matrix.pakgs }}
         uses: sbwml/openwrt-gh-action-sdk@main
