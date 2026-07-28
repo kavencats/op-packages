@@ -61,6 +61,7 @@
 
 	<!-- Security -->
 	<meta http-equiv="X-Content-Type-Options" content="nosniff">
+	<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 	<meta http-equiv="X-XSS-Protection" content="1; mode=block">
 	<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 
@@ -72,23 +73,9 @@
 	<meta name="apple-mobile-web-app-title" content="{{ hostname }} - LuCI">
 
 	<!-- Theme and Colors -->
-	{% if (mode == 'normal'): %}
-		<meta name="theme-color" content="{{ bar_color }}">
-		<script type="text/javascript">
-			let prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-			if (prefersDarkMode) {
-				const viewport = document.querySelector("meta[name=theme-color]");
-				viewport.setAttribute('content', '#444950');
-			}
-		</script>
-	{% elif (mode == 'dark'): %}
-		<meta name="theme-color" content="#444950">
-	{% elif (mode == 'light'): %}
-		<meta name="theme-color" content="{{ bar_color }}">
-	{% endif %}
+	<meta name="theme-color" content="{{ bar_color }}">
 	<meta name="msapplication-TileColor" content="{{ bar_color }}">
 	<meta name="msapplication-TileImage" content="{{ media }}/icon/ms-icon-144x144.png">
-	<meta itemprop="image" content="{{ media }}/icon/android-icon-192x192.png">
 	<meta name="application-name" content="{{ hostname }} - LuCI">
 
 	<!-- Icons and Manifest -->
@@ -97,8 +84,9 @@
 	<link rel="icon" type="image/png" sizes="32x32" href="{{ media }}/icon/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="96x96" href="{{ media }}/icon/favicon-96x96.png">
 	<link rel="icon" type="image/png" sizes="192x192" href="{{ media }}/icon/android-icon-192x192.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="{{ media }}/icon/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="{{ media }}/icon/apple-icon-72x72.png">
 	<link rel="apple-touch-icon" sizes="144x144" href="{{ media }}/icon/apple-icon-144x144.png">
-	<link rel="apple-touch-icon" sizes="192x192" href="{{ media }}/icon/apple-icon-192x192.png">
 	<link rel="manifest" href="{{ media }}/icon/manifest.json" crossorigin="use-credentials">
 
 	<link rel="stylesheet" href="{{ media }}/css/cascade.css{# ?v=PKG_VERSION #}">

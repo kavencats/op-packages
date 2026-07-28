@@ -35,7 +35,6 @@
 	//Custom settings
 	let mode = 'normal';
 	let bar_color = '#5e72e4';
-	let font_weight = '600';
 	let primary, dark_primary, blur_radius, blur_radius_dark, blur_opacity, blur_opacity_dark;
 	const dark_css = readfile('/www/luci-static/argon/css/dark.css');
 	if (access('/etc/config/argon')) {
@@ -47,16 +46,6 @@
 		blur_opacity_dark = cfg.get_first('argon', 'global', 'transparency_dark');
 		mode = cfg.get_first('argon', 'global', 'mode');
 		bar_color = (mode == 'dark') ? dark_primary : primary;
-		font_weight = cfg.get_first('argon', 'global', 'font_weight');
-		progressbar_font = cfg.get_first('argon', 'global', 'progressbar_font');
-		if (!progressbar_font) {
-			progressbar_font = "#2e2b60";
-		};
-		if (font_weight == "normal") {
-			main_left_font_color = "#5f6368";
-		} else {
-			main_left_font_color = "#69758c";
-		};
 	}
 
 -%}
@@ -73,6 +62,7 @@
 
 	<!-- Security -->
 	<meta http-equiv="X-Content-Type-Options" content="nosniff">
+	<!-- <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"> -->
 	<meta http-equiv="X-XSS-Protection" content="1; mode=block">
 	<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 
@@ -84,23 +74,9 @@
 	<meta name="apple-mobile-web-app-title" content="{{ hostname }} - LuCI">
 
 	<!-- Theme and Colors -->
-	{% if (mode == 'normal'): %}
-		<meta name="theme-color" content="{{ bar_color }}">
-		<script type="text/javascript">
-			let prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-			if (prefersDarkMode) {
-				const viewport = document.querySelector("meta[name=theme-color]");
-				viewport.setAttribute('content', '#444950');
-			}
-		</script>
-	{% elif (mode == 'dark'): %}
-		<meta name="theme-color" content="#444950">
-	{% elif (mode == 'light'): %}
-		<meta name="theme-color" content="{{ bar_color }}">
-	{% endif %}
+	<meta name="theme-color" content="{{ bar_color }}">
 	<meta name="msapplication-TileColor" content="{{ bar_color }}">
 	<meta name="msapplication-TileImage" content="{{ media }}/icon/ms-icon-144x144.png">
-	<meta itemprop="image" content="{{ media }}/icon/android-icon-192x192.png">
 	<meta name="application-name" content="{{ hostname }} - LuCI">
 
 	<!-- Icons and Manifest -->
@@ -109,8 +85,9 @@
 	<link rel="icon" type="image/png" sizes="32x32" href="{{ media }}/icon/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="96x96" href="{{ media }}/icon/favicon-96x96.png">
 	<link rel="icon" type="image/png" sizes="192x192" href="{{ media }}/icon/android-icon-192x192.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="{{ media }}/icon/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="{{ media }}/icon/apple-icon-72x72.png">
 	<link rel="apple-touch-icon" sizes="144x144" href="{{ media }}/icon/apple-icon-144x144.png">
-	<link rel="apple-touch-icon" sizes="192x192" href="{{ media }}/icon/apple-icon-192x192.png">
 	<link rel="manifest" href="{{ media }}/icon/manifest.json" crossorigin="use-credentials">
 
 	<link rel="stylesheet" href="{{ media }}/css/cascade.css{# ?v=PKG_VERSION #}">
@@ -131,9 +108,6 @@
 			--blur-opacity:{{ blur_opacity }};
 			--blur-radius-dark:{{ blur_radius_dark }}px;
 			--blur-opacity-dark:{{ blur_opacity_dark }};
-			--progressbar-font-color:{{ progressbar_font }};
-			--font-weight:{{ font_weight }};
-			--main-left-font-color:{{ main_left_font_color }};
 		}
 		{% endif -%}
 	</style>
@@ -158,7 +132,7 @@
 	<div class="main">
 		<div class="main-left" id="mainmenu" style="display:none">
 			<div class="sidenav-header d-flex align-items-center">
-				<a class="brand" href="/">{{ hostname }}</a>
+				<a class="brand" href="#">{{ hostname }}</a>
 				<div class="ml-auto">
 					<!-- Sidenav toggler -->
 					<div class="sidenav-toggler d-none d-xl-block active" data-action="sidenav-unpin"
@@ -178,7 +152,7 @@
 					<div class="container">
 						<div class="flex1">
 							<a class="showSide"></a>
-							<a class="brand" href="/">{{ hostname }}</a>
+							<a class="brand" href="#">{{ hostname }}</a>
 						</div>
 						<div class="status" id="indicators"></div>
 					</div>

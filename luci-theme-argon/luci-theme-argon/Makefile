@@ -7,18 +7,11 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Argon Theme
-LUCI_DEPENDS:=+curl +jsonfilter
-PKG_VERSION:=2.4.2
-PKG_RELEASE:=20260210
+LUCI_DEPENDS:=+USE_APK:wget-any +!USE_APK:wget +jsonfilter
+PKG_VERSION:=2.4.5
+PKG_RELEASE:=20260718
 
-define Package/luci-theme-argon/postrm
-#!/bin/sh
-[ -n "$${IPKG_INSTROOT}" ] || {
-	uci -q delete luci.themes.Argon
-	uci set luci.main.mediaurlbase='/luci-static/bootstrap'
-	uci commit luci
-}
-endef
+CONFIG_LUCI_CSSTIDY:=
 
 include $(TOPDIR)/feeds/luci/luci.mk
 
