@@ -1,18 +1,20 @@
-# SPDX-License-Identifier: GPL-3.0-only
-#
-# Copyright (C) 2021-2026  sirpdboy  <herboy2008@gmail.com> https://github.com/sirpdboy/luci-app-lucky
-# 
-# This is free software, licensed under the Apache License, Version 2.0 .
-#
+# SPDX-License-Identifier: Apache-2.0
+
 include $(TOPDIR)/rules.mk
+include $(INCLUDE_DIR)/version.mk
 
 PKG_NAME:=luci-app-lucky
-PKG_VERSION:=3.0.3
-PKG_RELEASE:=15
+PKG_VERSION:=3.0.0
+PKG_RELEASE:=1
 
-LUCI_TITLE:=LuCI Support for Dynamic lucky Client
-LUCI_DEPENDS:=+lucky
+LUCI_TITLE:=LuCI support for Lucky
+LUCI_DESCRIPTION:=Manage the Lucky service and its basic web settings.
+LUCI_DEPENDS:=+lucky +rpcd-mod-file
 LUCI_PKGARCH:=all
+
+ifneq ($(filter 19.07%,$(VERSION_NUMBER)),)
+  LUCI_DEPENDS+=+luci-compat
+endif
 
 include $(TOPDIR)/feeds/luci/luci.mk
 
